@@ -1,0 +1,24 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Environment files
+.env
+venv/
+env/
+
+# Editor settings
+.vscode/
+.idea/
+
+# macOS system files
+.DS_Store
+
+# Temporary / backup files
+*.log
+*.tmp
+*.bak
+
+#Appstore files
+dist/
+*.zip

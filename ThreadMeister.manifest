@@ -1,0 +1,14 @@
+{
+    "autodeskProduct": "Fusion",
+    "type": "addin",
+    "id": "ThreadMeister",
+    "author": "Andreas Kircher",
+    "description": {
+        "": "Create heat-set insert holes with CNC Kitchen recommendations"
+    },
+    "version": "1.0.0",
+    "runOnStartup": false,
+    "supportedOS": "windows|mac",
+    "editEnabled": true,
+    "iconFilename": "ThreadMeister.svg"
+}

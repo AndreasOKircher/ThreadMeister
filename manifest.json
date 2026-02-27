@@ -1,0 +1,16 @@
+{
+    "autodeskProduct": "Fusion",
+    "type": "addin",
+    "id": "ThreadMeister",
+    "author": "Andreas Kircher",
+    "company": "Andreas Kircher",
+    "description": "Generates accurate heat‑set insert holes for 3D‑printed parts using CNC Kitchen specifications.",
+    "name": "ThreadMeister",
+    "version": "1.0.0",
+    "runOnStartup": false,
+    "supportedOS": ["Windows", "MacOS"],
+    "editEnabled": true,
+    "iconFilename": "ThreadMeister.png",
+    "productUrl": "https://github.com/AndreasOKircher/ThreadMeister",
+    "helpUrl": "https://github.com/AndreasOKircher/ThreadMeister"
+}
