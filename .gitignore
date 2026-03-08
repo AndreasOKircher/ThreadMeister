@@ -22,3 +22,9 @@ env/
 #Appstore files
 dist/
 *.zip
+
+# Internal planning / ideas
+idea/
+
+# Claude
+.claude/

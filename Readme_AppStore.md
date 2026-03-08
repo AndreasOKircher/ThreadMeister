@@ -24,8 +24,17 @@ This makes it ideal for designers who frequently use threaded inserts in 3D-prin
 - Intuitive, user‑friendly dialog
 - Insert specifications can be customized or extended through a simple configuration file
 
+<br>
+
+<div align="center">
+  <img src="resources/images/ThreadMeisterAnimation.gif" alt="ThreadMeister in action" width="600">
+</div>
 
 ---
+
+## Why ThreadMeister?
+
+Tired of looking up insert dimensions every time you need a heat-set bore? ThreadMeister has them built in. Pick your size, select your sketch points, and the correctly dimensioned hole is cut directly into your model — no manual circle sketching or extrude cuts required.
 
 ## Platform Support
 
@@ -70,7 +79,7 @@ Blind holes include an additional 1 mm clearance depth (additional depth can b
 
 <div align="center">
   <img src="resources/images/Screenshot3.png" alt="ThreadMeister timeline entry" width="600"><br>
-  <strong>Bore is fully associated with sketch dimensions</strong>
+  <strong>Bore is fully associated with sketch dimensions and all features a grouped in the time </strong>
 </div>
 
 ---
@@ -92,17 +101,23 @@ Create the hole in a simpler sketch (or a separate sketch) to avoid this issue.
 
 ---
 
+## Changelog
+
+- **v1.0.1** — License changed to MIT, added GIF demo, documentation improvements
+- **v1.0.0** — 2026-02 — Initial public release
+
 ## Credits
 
-- Developer: Andreas Kircher  
-- Insert specifications: CNC Kitchen  
-- Code assistance: CAI‑assisted coding  
+- Developer: Andreas Kircher
+- Insert specifications: CNC Kitchen
+- Code assistance: CAI‑assisted coding
+- Animation recorded with [ScreenToGif](https://www.screentogif.com)
 
 ---
 
 ## License
 
-ThreadMeister is licensed under the **GNU General Public License v3.0 (GPL‑3.0)**.  
+ThreadMeister is licensed under the **MIT License**.
 A copy of the license is included in the package.
 
 ---

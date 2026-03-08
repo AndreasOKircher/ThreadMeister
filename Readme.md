@@ -3,16 +3,18 @@
   <img src="https://img.shields.io/badge/Platform-macOS%20⚠%20Pending-999999?style=for-the-badge" alt="macOS Pending">
   <img src="https://img.shields.io/badge/Fusion%20360-Add--In-FF6F00?style=for-the-badge" alt="Fusion 360 Add-In">
   <img src="https://img.shields.io/badge/Language-Python-3776AB?style=for-the-badge" alt="Python">
-  <img src="https://img.shields.io/badge/License-GPL--3.0--or--later-blue?style=for-the-badge" alt="GPL-3.0-or-later">
+  <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License">
   <img src="https://img.shields.io/badge/Distribution-GitHub%20%7C%20App%20Store-6E40C9?style=for-the-badge" alt="Distribution">
 </p>
+
+
+<h1 align="center">ThreadMeister – Heat-Set Insert Add-in for Fusion 360</h1>
 
 <div align="center">
   <img src="resources/images/Title.png" alt="ThreadMeister Logo" width="600">
 </div>
 
-# ThreadMeister – Heat-Set Insert Add-in for Fusion 360
-An add-in for Autodesk Fusion 360 that automates the creation of heat-set insert holes for 3D printing, using insert dimension recommendations from [CNC Kitchen](https://cnckitchen.com).
+<p align="center" style="max-width:600px; margin: 0 auto;">An add-in for Autodesk Fusion 360 that automates the creation of heat-set insert holes for 3D printing, using insert dimension recommendations from <a href="https://cnckitchen.com">CNC Kitchen</a>.</p>
 
 ## Features
 
@@ -24,6 +26,16 @@ An add-in for Autodesk Fusion 360 that automates the creation of heat-set insert
 -  **Timeline grouping** - All operations grouped with descriptive names for easy management
 -  **Direct integration** - Holes are cut directly into your part, no manual combine operations needed
 -  **User-friendly interface** - Button in SOLID > MODIFY menu with intuitive dialog
+
+<br>
+
+<div align="center">
+  <img src="resources/images/ThreadMeisterAnimation.gif" alt="ThreadMeister in action" width="600">
+</div>
+
+## Why ThreadMeister?
+
+Tired of googling insert dimensions every time you need a bore for a heat-set insert? ThreadMeister has them built in — just pick your size and it creates the hole directly in your model. No more manual circle sketching, no more wrong depths, no more manual extrude cuts.
 
 ## Platform Support
 
@@ -112,7 +124,7 @@ In the config.ini file you can:
  <br><br> <!-- spacing between images -->
 
  </div> <div align="center"> <img src="resources/images/Screenshot3.png" alt="Creates entry into the timeline"> <br>
-  <strong>Bore is associated with sketch dimensions</strong> </div>
+  <strong>Bore is associated with sketch dimensions and all features a grouped in the time</strong> </div>
 
 
 ## Requirements
@@ -142,6 +154,16 @@ In the config.ini file you can:
 - The chamfer and fillet radius can be selected in the config menu
 
 
+## Changelog
+
+### v1.0.1 — 2026-03-07
+- Switched license from GPL-3.0 to MIT
+- Added animated GIF demo
+- Added "Why ThreadMeister?" section
+- README layout improvements
+
+### v1.0.0 — 2026-02 — Initial public release
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit issues or pull requests.
@@ -151,11 +173,12 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 - **Developed by**: [Andreas Kircher](https://github.com/AndreasOKircher)
 - **Code assistance**: CAI‑assisted coding using Perplexity / Claude
 - **Insert specifications**: [CNC Kitchen](https://cnckitchen.com)
+- **Animation recorded with**: [ScreenToGif](https://www.screentogif.com)
 
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 (GPL‑3.0).
+This project is licensed under the MIT License.
 See the LICENSE file for details.
 
 ## Disclaimer

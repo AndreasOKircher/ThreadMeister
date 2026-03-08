@@ -6,7 +6,7 @@
     "company": "Andreas Kircher",
     "description": "Generates accurate heat‑set insert holes for 3D‑printed parts using CNC Kitchen specifications.",
     "name": "ThreadMeister",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "runOnStartup": false,
     "supportedOS": ["Windows", "MacOS"],
     "editEnabled": true,

@@ -1,5 +1,14 @@
 # Changelog
-## 1.0.0 — Initial Release
+
+## 1.0.1 — 2026-03-07 — Documentation update
+- Switched license from GPL-3.0 to MIT
+- Added animated GIF demo to README and App Store README
+- Added "Why ThreadMeister?" section to both READMEs
+- Added ScreenToGif credit
+- README layout improvements (centered headline, image spacing)
+- Cleaned up duplicate icon files from resources/ root
+
+## 1.0.0 — 2026-02 — Initial Release
 - First public release of ThreadMeister.
 - Distributed simultaneously on **GitHub** and the **Autodesk App Store** (release pending).
 - Tested on Windows; macOS support expected but not tested
