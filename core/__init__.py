@@ -1,0 +1,1 @@
+# ThreadMeister core module package

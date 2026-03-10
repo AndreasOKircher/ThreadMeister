@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.1.0b — 2026-03-10 — Code organization & sub-function refactoring
+- **Modules moved to `core/` subdirectory** for cleaner project structure
+- **Updated deploy script** to copy modules from `core/` subdirectory
+- **Refactored `findProfileForCircle()`** into testable sub-functions:
+  - `_filter_by_area()` – coarse area validation
+  - `_filter_by_centroid()` – coarse centroid distance check
+  - `_filter_by_bounding_box()` – coarse bounding box containment
+  - `_accumulate_profiles()` – precise profile area matching
+- **Improved code testability** – each filter function can be tested independently
+- **Foundation for Phase 2** – prepares for pytest unit tests and Phase 3 fixture-based testing
+- No functional changes – all features work identically to v1.1.0
+- ✅ Verified working in Fusion 360 (blind holes, through holes, chamfer, fillet)
+
+## 1.1.0 — 2026-03-09 — Refactoring into modules
+- Split monolithic `ThreadMeister.py` (~1500 lines) into 6 focused modules:
+  - `tm_state.py` – shared globals, constants
+  - `tm_config.py` – config loading, validation, saving
+  - `tm_helpers.py` – geometry comparisons, logging, `calc_blind_hole_depth()`
+  - `tm_geometry.py` – profile finding, extrusion, chamfer, fillet
+  - `tm_execute.py` – `CommandExecuteHandler` (main hole creation loop)
+  - `tm_ui.py` – UI event handlers, info text
+- `ThreadMeister.py` is now a thin entry point (`run()` / `stop()` only)
+- Removed dead code (duplicate import/config block from lines 1221-1249)
+- No functional changes – identical behaviour to v1.0.1
+
 ## 1.0.1 — 2026-03-07 — Documentation update
 - Switched license from GPL-3.0 to MIT
 - Added animated GIF demo to README and App Store README

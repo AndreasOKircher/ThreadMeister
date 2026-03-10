@@ -124,7 +124,7 @@ In the config.ini file you can:
  <br><br> <!-- spacing between images -->
 
  </div> <div align="center"> <img src="resources/images/Screenshot3.png" alt="Creates entry into the timeline"> <br>
-  <strong>Bore is associated with sketch dimensions and all features a grouped in the time</strong> </div>
+  <strong>Bore is associated with sketch dimensions and all features a grouped in the timeline</strong> </div>
 
 
 ## Requirements
@@ -155,6 +155,18 @@ In the config.ini file you can:
 
 
 ## Changelog
+
+### v1.1.0 — 2026-03-10
+- **Refactoring**: Split monolithic `ThreadMeister.py` into 6 focused modules (`core/tm_*.py`)
+- **Code organization**: Moved all tm_* modules into `core/` subdirectory for cleaner structure
+- **Profile selection**: Refactored `findProfileForCircle()` into testable sub-functions:
+  - `_filter_by_area()` — area validation
+  - `_filter_by_centroid()` — centroid distance check
+  - `_filter_by_bounding_box()` — bounding box containment
+  - `_accumulate_profiles()` — profile area matching
+- **No functional changes** — all features work identically, refactoring is internal only
+- **Improved testability** — sub-functions can now be tested independently
+- **Foundation for Phase 2** — prepares for unit test suite (pytest) and Phase 3 fixture-based testing
 
 ### v1.0.1 — 2026-03-07
 - Switched license from GPL-3.0 to MIT

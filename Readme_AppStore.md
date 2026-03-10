@@ -79,7 +79,7 @@ Blind holes include an additional 1 mm clearance depth (additional depth can b
 
 <div align="center">
   <img src="resources/images/Screenshot3.png" alt="ThreadMeister timeline entry" width="600"><br>
-  <strong>Bore is fully associated with sketch dimensions and all features a grouped in the time </strong>
+  <strong>Bore is fully associated with sketch dimensions and all features a grouped in the timeline</strong>
 </div>
 
 ---
