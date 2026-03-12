@@ -1,7 +1,7 @@
 """
 tm_execute.py – CommandExecuteHandler: orchestrates the hole creation loop.
 """
-import adsk.core, adsk.fusion, traceback
+import adsk.core, adsk.fusion, traceback, os
 import tm_state
 import tm_config
 from tm_helpers import log, clear_log, calc_blind_hole_depth
@@ -29,6 +29,8 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
             addChamfer = inputs.itemById('addChamfer')
             addBottomRadius = inputs.itemById('addBottomRadius')
             showSuccessMessage = inputs.itemById('showSuccessMessage')
+            exportDebugInput = inputs.itemById('exportDebug')
+            shouldExport = exportDebugInput is not None and exportDebugInput.value
 
             targetBody = bodySelect.selection(0).entity
             selectedPoints = [pointSelect.selection(i).entity for i in range(pointSelect.selectionCount)]
@@ -89,6 +91,20 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
                     continue
 
                 log("Profile(s) found successfully")
+
+                # Export debug JSON if enabled
+                if shouldExport:
+                    try:
+                        from tm_debug_export import export_sketch_data
+                        export_dir = os.path.join(
+                            os.path.dirname(os.path.dirname(__file__)), 'debug_exports')
+                        os.makedirs(export_dir, exist_ok=True)
+                        export_sketch_data(
+                            parentSketch, circle, export_dir,
+                            description=f"Point {point_idx+1} - {insertName}"
+                        )
+                    except Exception as e:
+                        log(f"[DEBUG EXPORT] Error: {e}")
 
                 direction = findExtrudeDirectionFromSketch(parentSketch, center2d, targetBody)
 

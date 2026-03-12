@@ -85,6 +85,11 @@ def load_config():
                 tm_state.CONFIG['enable_logging'] = False
 
             try:
+                tm_state.CONFIG['enable_debug_export'] = config.getboolean('Settings', 'enable_debug_export', fallback=False)
+            except ValueError:
+                tm_state.CONFIG['enable_debug_export'] = False
+
+            try:
                 tm_state.CONFIG['last_selected_insert'] = config.get('Settings', 'last_selected_insert', fallback='M3 x 5.7mm (standard)')
             except Exception:
                 tm_state.CONFIG['last_selected_insert'] = 'M3 x 5.7mm (standard)'
@@ -226,6 +231,12 @@ def create_default_config():
             f.write('\n')
             f.write('# Show success message after operation (True or False)\n')
             f.write('show_success_message = True\n')
+            f.write('\n')
+            f.write('# Enable logging to Fusion TextCommands console (True or False)\n')
+            f.write('enable_logging = False\n')
+            f.write('\n')
+            f.write('# Enable debug JSON export button in dialog (developer/support feature)\n')
+            f.write('enable_debug_export = False\n')
             f.write('\n')
             f.write('# Last selected insert (will be remembered between sessions)\n')
             f.write('last_selected_insert = M3 x 5.7mm (standard)\n')

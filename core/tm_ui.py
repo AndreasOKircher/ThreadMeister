@@ -84,6 +84,13 @@ class CommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
                                      True, '',
                                      tm_state.CONFIG['show_success_message'])
 
+            # Debug export button — only visible when enabled in config.ini
+            if tm_state.CONFIG.get('enable_debug_export', False):
+                inputs.addBoolValueInput('exportDebug',
+                                        'Export Debug JSON (saves fixture to debug_exports/)',
+                                        True, '',
+                                        False)
+
             # Info text
             inputs.addTextBoxCommandInput('infoText', '', '', 4, True)
             updateInfoText(inputs)

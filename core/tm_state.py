@@ -36,6 +36,7 @@ CONFIG = {
     'bottom_radius_enabled_default': False,
     'show_success_message': True,
     'enable_logging': False,
+    'enable_debug_export': False,
     'hole_type_blind': True,
     'last_selected_insert': 'M3 x 5.7mm (standard)',
 }
