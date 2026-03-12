@@ -1,0 +1,11 @@
+{
+  "description": "Single M3 bore, no crossing lines - baseline case",
+  "target_circle": {
+    "center_xy": [5.0, 5.0],
+    "radius_cm": 0.22,
+    "area_low": 0.1521,
+    "area_high": 0.15208
+  },
+  "profiles": [],
+  "expected_result": []
+}
