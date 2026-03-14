@@ -10,7 +10,7 @@ using the dimensional specifications from CNC Kitchen.
 Author: Andreas Kircher (Andreas.O.Kircher@gmail.com)
 Created with assistance from: Claude (Anthropic) / Perplexity
 Insert specifications from: CNC Kitchen (cnckitchen.com)
-Version: 1.1.0b
+Version: 1.2.0
 
 Features:
 - Creates heat-set insert holes at sketch points
@@ -20,6 +20,7 @@ Features:
 - Automatic bottom radius for blind holes
 - Timeline grouping for easy management
 - Direct subtraction from target body
+- Clean temp sketch approach for reliable profile selection
 
 Usage:
 1. Create a sketch with points where you want insert holes
@@ -31,8 +32,6 @@ Usage:
 Known Issues:
 - Not tested with Apple macOS
 - Overlapping bores may cause incomplete extrusions (no chamfer/radius)
-- Complex sketches with many elements near the bore may cause wrong profile selection
-  (more than 15 profiles within the bore circle)
 """
 import traceback
 import os

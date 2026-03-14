@@ -1,5 +1,36 @@
 # Changelog
 
+## 1.2.0 — 2026-03-14 — Clean temp sketch approach
+- **Major redesign of bore creation**: replaced drawing bore circle in user's sketch with creating a clean temporary sketch via `addWithoutEdges(face)`
+- **Problem solved**: Fusion 360 auto-projects 3D body edges onto sketch planes as reference curves, which split bore profiles unpredictably and caused extrusion failures
+- **New flow**: create projection-free temp sketch → project original point (parametric link) → draw bore circle → trivial 2-profile selection
+- Temp sketches named `TM_{insert}_P{n}`, included in timeline group
+- On failure, temp sketch is deleted and point is skipped — user's original sketch is never modified
+- Added `isReference` curve skip in `_filter_by_curve_points`
+- Added `is_reference` field to debug export curve data
+- Removed all `log()` calls from `tm_geometry.py` and `tm_execute.py`
+- Removed `diagnose_blind_hole()` diagnostic function
+- Deleted scratch scripts (`analyze_loop3.py`, `test_curves_debug.py`, `test_import.py`)
+- Updated `development-notes.md` with Phase 5 documentation
+- ✅ All tests passing, verified in Fusion 360
+
+## 1.1.2 — 2026-03-13 — Export & visualization infrastructure
+- Added `tm_debug_export.py` for JSON export of sketch profiles/curves from Fusion 360
+- Added `visualize_profiles.py` standalone matplotlib visualization tool
+- Added `profile_inspector.py` interactive profile/curve inspector
+- Added `test_profile_selection.py` fixture-based tests
+- Added curve-point filter (`_filter_by_curve_points`) to `findProfileForCircle`
+- Standardized logging with `[TM][filter_name]` prefix format
+- Added debug export UI: `exportDebug` checkbox in dialog (behind `enable_debug_export` config flag)
+- Export produces dual output: Fusion console `[EXPORT]` messages + JSON files to `debug_exports/`
+
+## 1.1.1 — 2026-03-11 — Pytest test suite
+- Added 49 comprehensive unit tests covering `tm_helpers`, `tm_config`, and `tm_geometry` filter functions
+- Mock-based testing with zero Fusion 360 dependency
+- `conftest.py` handles `adsk` module stubbing before imports
+- Added test infrastructure: `pytest.ini`, `requirements-dev.txt`, `.venv` setup
+- All tests pass and ready for CI/CD integration
+
 ## 1.1.0b — 2026-03-10 — Code organization & sub-function refactoring
 - **Modules moved to `core/` subdirectory** for cleaner project structure
 - **Updated deploy script** to copy modules from `core/` subdirectory

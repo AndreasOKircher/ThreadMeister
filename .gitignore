@@ -24,6 +24,12 @@ env/
 dist/
 *.zip
 
+# Debug exports (generated at runtime)
+debug_exports/
+
+# Test fixtures (exported from Fusion 360, dev-only)
+fixtures/export_*.json
+
 # Internal planning / ideas
 idea/
 

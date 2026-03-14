@@ -109,10 +109,31 @@ All dimensions follow CNC Kitchen's official recommendations:
 **Note:**  For blind holes, the add‑in automatically adds 1 mm extra depth for clearance by default.
 
 ### Customize settings
-In the config.ini file you can:
--  Add your custom inserts. 
--  Set fillet and chamfer dimensions.
--  Set blind hole extra depth
+
+Edit `config.ini` to adjust behavior. The file is located in the add-in folder.
+
+**`[Settings]`**
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `chamfer_size` | 0.5 | Top chamfer size in mm (45° chamfer) |
+| `chamfer_enabled_default` | True | Chamfer checkbox default state in the dialog |
+| `bottom_radius_size` | 0.5 | Bottom fillet radius in mm (blind holes only) |
+| `bottom_radius_enabled_default` | True | Bottom fillet checkbox default state in the dialog |
+| `blind_hole_extra_depth` | 1.0 | Extra depth added to blind holes in mm (clearance for insert) |
+| `hole_type_blind` | True | Default hole type: `True` = Blind Hole, `False` = Through Hole |
+| `show_success_message` | False | Show confirmation dialog after successful operation |
+| `enable_logging` | False | Write debug messages to Fusion's Text Commands palette |
+| `enable_debug_export` | False | Show "Export Debug JSON" checkbox in the dialog (for development) |
+
+**`[Inserts]`**
+
+Each line defines an insert: `name = hole_diameter_mm, insert_length_mm, min_wall_thickness_mm`
+
+You can add custom inserts by adding a new line, e.g.:
+```ini
+M3 x 6mm (custom) = 4.6, 6.0, 1.8
+```
 
 
 
@@ -156,23 +177,27 @@ In the config.ini file you can:
 
 ## Changelog
 
+### v1.2.0 — 2026-03-14
+- **Clean temp sketch approach**: bore circles are now created in a projection-free temporary sketch, eliminating profile selection failures caused by Fusion 360's auto-projected body edges
+- Parametric association maintained — moving the original sketch point updates the bore automatically
+- Temp sketches named `TM_{insert}_P{n}`, grouped in timeline
+- User's original sketch is never modified
+
+### v1.1.2 — 2026-03-13
+- Added debug export and visualization tools for profile analysis
+- Added curve-point filter to profile selection algorithm
+
+### v1.1.1 — 2026-03-11
+- Added pytest test suite (49+ unit tests, zero Fusion 360 dependency)
+
 ### v1.1.0 — 2026-03-10
-- **Refactoring**: Split monolithic `ThreadMeister.py` into 6 focused modules (`core/tm_*.py`)
-- **Code organization**: Moved all tm_* modules into `core/` subdirectory for cleaner structure
-- **Profile selection**: Refactored `findProfileForCircle()` into testable sub-functions:
-  - `_filter_by_area()` — area validation
-  - `_filter_by_centroid()` — centroid distance check
-  - `_filter_by_bounding_box()` — bounding box containment
-  - `_accumulate_profiles()` — profile area matching
-- **No functional changes** — all features work identically, refactoring is internal only
-- **Improved testability** — sub-functions can now be tested independently
-- **Foundation for Phase 2** — prepares for unit test suite (pytest) and Phase 3 fixture-based testing
+- Split monolithic `ThreadMeister.py` into 6 focused modules (`core/tm_*.py`)
+- Refactored `findProfileForCircle()` into testable sub-functions
+- No functional changes — internal refactoring only
 
 ### v1.0.1 — 2026-03-07
 - Switched license from GPL-3.0 to MIT
-- Added animated GIF demo
-- Added "Why ThreadMeister?" section
-- README layout improvements
+- Added animated GIF demo and README improvements
 
 ### v1.0.0 — 2026-02 — Initial public release
 
@@ -228,27 +253,10 @@ Workarounds:
 
 ---
 
-### Sketch profile overload near the bore circle
-Fusion 360 may fail to create the bore, chamfer, or fillet if the sketch contains too many intersecting lines around the selected sketch point. When ThreadMeister creates the inner bore circle, Fusion automatically detects all enclosed regions (profiles). If this area contains more than ~15 profiles, operations may fail.
+### Sketch profile overload (resolved in v1.2.0)
+In earlier versions, ThreadMeister drew the bore circle in the user's existing sketch. If that sketch had many intersecting lines or Fusion's auto-projected body edges near the bore location, profile selection could fail.
 
-Symptoms include:
-- Bore not extruded as a clean cylinder  
-- Chamfer operation fails  
-- Fillet operation fails  
-- “Profile not found” or “Operation failed”  
-
-Common causes:
-- Dense or complex sketches  
-- Many crossing lines near the bore location  
-- Imported DXF geometry  
-- Leftover construction lines or unused sketch elements  
-- Parametric sketches with heavy constraints  
-
-Workarounds:
-- Simplify the sketch around the bore location  
-- Isolate the bore circle on a separate sketch  
-- Remove or convert unnecessary lines to construction geometry  
-- Avoid overlapping sketch elements in the bore region  
+Since v1.2.0, ThreadMeister creates a clean temporary sketch containing only the bore circle, eliminating this issue entirely.
 
 
 

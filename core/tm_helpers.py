@@ -1,10 +1,9 @@
 """
-tm_helpers.py – Utility functions: geometry comparisons, logging, diagnostics.
+tm_helpers.py – Utility functions: geometry comparisons, logging.
 
 Also exports calc_blind_hole_depth() for use in tm_execute and tests.
 """
 import adsk.core
-import math
 import tm_state
 
 
@@ -60,8 +59,6 @@ def log(msg):
 def clear_log():
     """Clear the Text Commands palette (workaround: write 50 blank lines)."""
     try:
-        if not tm_state.CONFIG.get('enable_logging', False):
-            return
         app = adsk.core.Application.get()
         ui = app.userInterface
         p = ui.palettes.itemById('TextCommands')
@@ -74,40 +71,3 @@ def clear_log():
         pass
 
 
-def diagnose_blind_hole(component, targetBody, sketch, circleCenter, holeDiameter):
-    """
-    Diagnostic helper: logs all circular edges on targetBody sorted by radius proximity.
-    Call this if bottom radius consistently fails.
-    """
-    log("\n=== BLIND HOLE DIAGNOSTIC ===")
-
-    sketchTransform = sketch.transform
-    center3DSketch = adsk.core.Point3D.create(circleCenter.x, circleCenter.y, 0)
-    center3D = center3DSketch.copy()
-    center3D.transformBy(sketchTransform)
-
-    (origin, xAxis, yAxis, zAxis) = sketchTransform.getAsCoordinateSystem()
-    expectedRadius = holeDiameter / 2.0
-
-    log(f"Looking for edges with radius ~{expectedRadius:.4f}cm")
-    log(f"Along axis from ({center3D.x:.4f}, {center3D.y:.4f}, {center3D.z:.4f})")
-
-    allCircularEdges = []
-    for edge in targetBody.edges:
-        if edge.geometry.curveType == adsk.core.Curve3DTypes.Circle3DCurveType:
-            edgeCircle = edge.geometry
-            allCircularEdges.append({
-                'edge': edge,
-                'radius': edgeCircle.radius,
-                'center': edgeCircle.center
-            })
-
-    log(f"\nFound {len(allCircularEdges)} circular edges total")
-    log("\nClosest matches by radius:")
-
-    sorted_by_radius = sorted(allCircularEdges, key=lambda x: abs(x['radius'] - expectedRadius))
-    for i, info in enumerate(sorted_by_radius[:5]):
-        diff = abs(info['radius'] - expectedRadius)
-        log(f"  {i+1}. Radius: {info['radius']:.4f}cm (diff: {diff*10:.4f}mm)")
-
-    log("=== END DIAGNOSTIC ===\n")
