@@ -101,6 +101,7 @@ Blind holes include an additional 1 mm clearance depth (additional depth can b
 
 ## Changelog
 
+- **v1.2.1** — Added privacy policy, packaging script
 - **v1.2.0** — Clean temp sketch approach for reliable profile selection; eliminated failures caused by projected body edges
 - **v1.1.2** — Debug export and visualization tools for profile analysis
 - **v1.1.1** — Pytest test suite (49+ unit tests)

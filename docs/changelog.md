@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1 — 2026-03-14 — Privacy policy & packaging
+- Added privacy policy section to README (required for Autodesk App Store)
+- Added `package.bat` script for creating App Store zip packages
+
 ## 1.2.0 — 2026-03-14 — Clean temp sketch approach
 - **Major redesign of bore creation**: replaced drawing bore circle in user's sketch with creating a clean temporary sketch via `addWithoutEdges(face)`
 - **Problem solved**: Fusion 360 auto-projects 3D body edges onto sketch planes as reference curves, which split bore profiles unpredictably and caused extrusion failures

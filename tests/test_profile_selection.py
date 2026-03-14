@@ -48,14 +48,15 @@ def make_profile_from_fixture_data(profile_data):
     """
     profile = MagicMock()
 
-    # Area properties (use low accuracy as default)
+    # Area properties (use high accuracy to match actual Fusion behavior)
     area_props = MagicMock()
-    area_props.area = profile_data['area_low_accuracy']
+    area_props.area = profile_data['area_high_accuracy']
     area_props.centroid = make_point(
-        profile_data['centroid_low_xy'][0],
-        profile_data['centroid_low_xy'][1]
+        profile_data['centroid_high_xy'][0],
+        profile_data['centroid_high_xy'][1]
     )
-    profile.areaProperties.return_value = area_props
+    # Configure areaProperties to return the same object regardless of accuracy argument
+    profile.areaProperties = MagicMock(return_value=area_props)
 
     # Bounding box
     bbox_min = make_point(
@@ -91,6 +92,28 @@ def get_fixture_files():
     return sorted(glob.glob(os.path.join(fixtures_dir, '*.json')))
 
 
+class MockProfileCollection:
+    """
+    Wrapper for mock profiles to properly support iteration and .count attribute.
+
+    Fusion 360's sketch.profiles object needs to:
+    - Support iteration (for idx, prof in enumerate(sketch.profiles))
+    - Have a .count property (log(f"Total: {sketch.profiles.count}"))
+
+    MagicMock's built-in __iter__ handling doesn't work reliably, so we wrap
+    the list in a simple class that properly implements these requirements.
+    """
+    def __init__(self, profiles):
+        self.profiles = profiles
+        self.count = len(profiles)
+
+    def __iter__(self):
+        return iter(self.profiles)
+
+    def __len__(self):
+        return len(self.profiles)
+
+
 # ===== Fixtures =====
 
 @pytest.fixture(params=get_fixture_files(), ids=lambda p: os.path.basename(p))
@@ -112,7 +135,7 @@ class TestProfileSelection:
         assert isinstance(fixture_data['profiles'], list)
         assert isinstance(fixture_data['expected_result'], list)
 
-    @pytest.mark.xfail(reason="Stub fixtures - awaiting real data from Fusion 360 export")
+    
     def test_profile_selection_matches_expected(self, fixture_data):
         """
         Test that findProfileForCircle matches the expected result.
@@ -135,7 +158,7 @@ class TestProfileSelection:
             circle_data['center_xy'][1]
         )
         target_circle.radius = circle_data['radius_cm']
-        target_circle.area = circle_data['area_low']
+        target_circle.area = circle_data['area_high']
         target_circle.parentSketch = MagicMock()
 
         # Create mock profiles
@@ -144,9 +167,9 @@ class TestProfileSelection:
             for pd in profiles_data
         ]
 
-        # Create mock sketch
+        # Create mock sketch with proper profiles collection
         sketch = MagicMock()
-        sketch.profiles = mock_profiles
+        sketch.profiles = MockProfileCollection(mock_profiles)
         target_circle.parentSketch = sketch
 
         # Run the algorithm
@@ -184,6 +207,85 @@ class TestProfileSelection:
             assert 'max_xy' in profile['bbox']
 
 
+class TestCurveExport:
+    """Test sketch curve export in fixtures."""
+
+    def test_loops_exported(self, fixture_data):
+        """Verify that profile loops are exported."""
+        for profile in fixture_data['profiles']:
+            assert 'loops' in profile, "Profile missing 'loops' key"
+            assert isinstance(profile['loops'], list), "loops should be a list"
+
+    def test_loop_indices(self, fixture_data):
+        """Verify loop indices are sequential."""
+        for profile in fixture_data['profiles']:
+            loops = profile.get('loops', [])
+            for idx, loop in enumerate(loops):
+                assert 'loop_index' in loop, "Loop missing 'loop_index'"
+                assert loop['loop_index'] == idx, "Loop indices should be sequential"
+
+    def test_curve_types_valid(self, fixture_data):
+        """Verify each curve type is one of the supported types."""
+        valid_types = {'SketchLine', 'SketchArc', 'SketchCircle', 'SketchEllipticalArc', 'SketchEllipse'}
+        for profile in fixture_data['profiles']:
+            loops = profile.get('loops', [])
+            for loop in loops:
+                for curve in loop.get('curves', []):
+                    assert 'type' in curve, "Curve missing 'type'"
+                    assert curve['type'] in valid_types, \
+                        f"Invalid curve type: {curve['type']}, must be one of {valid_types}"
+
+    def test_curve_has_is_construction(self, fixture_data):
+        """Verify all curves have is_construction flag."""
+        for profile in fixture_data['profiles']:
+            loops = profile.get('loops', [])
+            for loop in loops:
+                for curve in loop.get('curves', []):
+                    assert 'is_construction' in curve, "Curve missing 'is_construction'"
+                    assert isinstance(curve['is_construction'], bool), \
+                        "is_construction should be boolean"
+
+    def test_sketchline_has_start_end(self, fixture_data):
+        """Verify SketchLine curves have start and end points."""
+        for profile in fixture_data['profiles']:
+            loops = profile.get('loops', [])
+            for loop in loops:
+                for curve in loop.get('curves', []):
+                    if curve['type'] == 'SketchLine':
+                        assert 'start_xy' in curve, "SketchLine missing 'start_xy'"
+                        assert 'end_xy' in curve, "SketchLine missing 'end_xy'"
+                        assert len(curve['start_xy']) == 2, "start_xy should be [x, y]"
+                        assert len(curve['end_xy']) == 2, "end_xy should be [x, y]"
+
+    def test_sketcharc_has_center_radius_start_end(self, fixture_data):
+        """Verify SketchArc curves have center, radius, start, and end."""
+        for profile in fixture_data['profiles']:
+            loops = profile.get('loops', [])
+            for loop in loops:
+                for curve in loop.get('curves', []):
+                    if curve['type'] == 'SketchArc':
+                        assert 'center_xy' in curve, "SketchArc missing 'center_xy'"
+                        assert 'radius' in curve, "SketchArc missing 'radius'"
+                        assert 'start_xy' in curve, "SketchArc missing 'start_xy'"
+                        assert 'end_xy' in curve, "SketchArc missing 'end_xy'"
+                        assert len(curve['center_xy']) == 2, "center_xy should be [x, y]"
+                        assert len(curve['start_xy']) == 2, "start_xy should be [x, y]"
+                        assert len(curve['end_xy']) == 2, "end_xy should be [x, y]"
+                        assert curve['radius'] > 0, "radius should be positive"
+
+    def test_sketchcircle_has_center_radius(self, fixture_data):
+        """Verify SketchCircle curves have center and radius."""
+        for profile in fixture_data['profiles']:
+            loops = profile.get('loops', [])
+            for loop in loops:
+                for curve in loop.get('curves', []):
+                    if curve['type'] == 'SketchCircle':
+                        assert 'center_xy' in curve, "SketchCircle missing 'center_xy'"
+                        assert 'radius' in curve, "SketchCircle missing 'radius'"
+                        assert len(curve['center_xy']) == 2, "center_xy should be [x, y]"
+                        assert curve['radius'] > 0, "radius should be positive"
+
+
 class TestSpecialCases:
     """Test special and edge cases."""
 
@@ -219,8 +321,10 @@ def _extract_result_indices(result, profiles):
     if result is None:
         return []
 
-    # Check if it's an ObjectCollection
-    if hasattr(result, '__iter__') and not isinstance(result, str):
+    # Check if it's an ObjectCollection (has _items that is a list)
+    # This prevents treating MagicMock profile objects (which auto-create _items) as ObjectCollections
+    if hasattr(result, '_items') and isinstance(result._items, list):
+        # It's an ObjectCollection
         indices = []
         for item in result:
             try:
@@ -230,7 +334,7 @@ def _extract_result_indices(result, profiles):
                 pass
         return indices
     else:
-        # Single profile
+        # Single profile object
         try:
             idx = profiles.index(result)
             return [idx]

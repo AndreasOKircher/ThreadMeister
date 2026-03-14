@@ -10,7 +10,7 @@ using the dimensional specifications from CNC Kitchen.
 Author: Andreas Kircher (Andreas.O.Kircher@gmail.com)
 Created with assistance from: Claude (Anthropic) / Perplexity
 Insert specifications from: CNC Kitchen (cnckitchen.com)
-Version: 1.2.0
+Version: 1.2.1
 
 Features:
 - Creates heat-set insert holes at sketch points

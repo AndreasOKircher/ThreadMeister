@@ -177,6 +177,10 @@ M3 x 6mm (custom) = 4.6, 6.0, 1.8
 
 ## Changelog
 
+### v1.2.1 — 2026-03-14
+- Added privacy policy (required for Autodesk App Store)
+- Added packaging script for App Store submissions
+
 ### v1.2.0 — 2026-03-14
 - **Clean temp sketch approach**: bore circles are now created in a projection-free temporary sketch, eliminating profile selection failures caused by Fusion 360's auto-projected body edges
 - Parametric association maintained — moving the original sketch point updates the bore automatically
@@ -261,5 +265,11 @@ Since v1.2.0, ThreadMeister creates a clean temporary sketch containing only the
 
 
 
+
+## Privacy Policy
+
+ThreadMeister does not collect, store, or transmit any personal data or usage information. All operations are performed locally within Autodesk Fusion 360. No data is sent to external servers, third parties, analytics tools, or advertising networks. No data retention or deletion policies are required as no data is collected. Since no data is collected, there is no consent to revoke or data to request deletion of.
+
+---
 
 **Happy 3D printing!** 🎉
