@@ -25,6 +25,8 @@ ThreadMeister/
 ├── ThreadMeister.png         ← Add-in icon (App Store)
 ├── License.txt               ← MIT License
 ├── Readme.md                 ← GitHub README
+├── AGENTS.md                 ← Instructions for coding agents (CLAUDE.md points here)
+├── CONTEXT.md                ← Domain glossary (canonical terms)
 ├── core/
 │   ├── tm_state.py           ← Global state: INSERT_SPECS, CONFIG, tolerances
 │   ├── tm_config.py          ← Config I/O: load/save config.ini
@@ -51,9 +53,13 @@ ThreadMeister/
 │   ├── test_geometry.py      ← Tests for tm_geometry filter functions
 │   └── test_profile_selection.py ← Fixture-based profile selection tests
 ├── dist/                     ← Build output (gitignored)
+├── .agents/skills/           ← Project skills: start-feature, finish-feature
+├── .scratch/<feature-slug>/  ← Feature workspaces: idea.md, issues/ (see docs/agents/)
 └── docs/
     ├── development-notes.md  ← This file
-    └── changelog.md          ← Version history
+    ├── changelog.md          ← Version history
+    ├── adr/                  ← Architecture decision records
+    └── agents/               ← Agent issue workflow, templates, triage labels
 ```
 
 ## Config.ini Structure (v1.2.2)
@@ -116,6 +122,8 @@ With the clean temp sketch approach (v1.2.0), the sketch contains only the bore 
 
 ## Phase 5 — Clean Temp Sketch Approach (v1.2.0)
 
+Decision record: `docs/adr/0001-clean-temp-sketch-per-bore.md`. Since 2026-09 `parentSketch.referencePlane` fails for sketches on a body face — see `docs/adr/0002-resolve-sketch-plane-without-referenceplane.md`.
+
 ### The problem: projected 3D geometry
 
 When a sketch is created on a face of a solid body, Fusion 360 automatically projects the body's edges onto the sketch plane as reference curves. These projected curves:
@@ -164,7 +172,7 @@ profile = findProfileForCircle(parentSketch, circle)  # could fail due to projec
 
 ### Future optimization: shared temp sketch
 
-When multiple points are selected from the same parent sketch, it's possible to create only 1 temp sketch per source sketch instead of 1 per point. This would reduce feature tree clutter. Not yet implemented — see memory for details.
+When multiple points are selected from the same parent sketch, it's possible to create only 1 temp sketch per source sketch instead of 1 per point. This would reduce feature tree clutter. Not yet implemented.
 
 ### Graph reconstruction (documented, not implemented)
 
