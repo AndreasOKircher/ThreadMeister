@@ -188,7 +188,7 @@ M3 x 6mm (custom) = 4.6, 6.0, 1.8
 
 ## Changelog
 
-### Unreleased
+### v1.2.3 — unreleased
 - Fixed: runs failed with "referencePlane is a BRefFace" when the sketch was on a body face (GitHub #1)
 
 ### v1.2.2 — 2026-03-16

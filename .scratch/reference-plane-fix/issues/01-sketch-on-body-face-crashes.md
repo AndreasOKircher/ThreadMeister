@@ -2,8 +2,9 @@
 
 Status: ready-for-human
 
-> **Status note.** Code done and unit-tested; waiting for the manual Fusion smoke test listed under Verification.
 GitHub: https://github.com/AndreasOKircher/ThreadMeister/issues/1
+
+> **Status note.** Code done and unit-tested; waiting for the manual Fusion smoke test listed under Verification.
 
 ## Symptom
 
