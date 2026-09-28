@@ -7,6 +7,8 @@ import tm_config
 from tm_helpers import calc_blind_hole_depth_mm
 from tm_geometry import (
     findProfileForCircle,
+    resolveSketchPlane,
+    alignExtrudeDirection,
     findExtrudeDirectionFromSketch,
     findChamferEdge,
     addChamferToEdge,
@@ -65,8 +67,12 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
                 center2d = point.geometry
 
                 # Create clean sketch without auto-projected body edges
-                face = parentSketch.referencePlane
-                tempSketch = component.sketches.addWithoutEdges(face)
+                plane = resolveSketchPlane(parentSketch, targetBody)
+                if plane is None:
+                    failedCount += 1
+                    failMessages.append(f"Point {point_idx+1}: Could not find the sketch's face. Try placing the sketch on a construction plane.")
+                    continue
+                tempSketch = component.sketches.addWithoutEdges(plane)
                 tempSketch.name = f"TM_{insertName}_P{point_idx+1}"
 
                 # Project original point to maintain parametric association
@@ -109,6 +115,9 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
                     tempSketch.deleteMe()
                     continue
 
+                # direction is relative to the Parent Sketch; the cut is made from the Temp Sketch
+                cutDirection = alignExtrudeDirection(direction, parentSketch, tempSketch)
+
                 extrudes = component.features.extrudeFeatures
                 extInput = extrudes.createInput(profile_or_collection, adsk.fusion.FeatureOperations.CutFeatureOperation)
 
@@ -119,12 +128,12 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
                     holeDepth = depth_mm / 10.0  # mm -> cm
                     dist = adsk.core.ValueInput.createByReal(holeDepth)
                     extent = adsk.fusion.DistanceExtentDefinition.create(dist)
-                    extInput.setOneSideExtent(extent, direction)
+                    extInput.setOneSideExtent(extent, cutDirection)
                 else:
                     throughDistance = findDistanceThroughBody(parentSketch, center2d, targetBody, direction)
                     dist = adsk.core.ValueInput.createByReal(throughDistance)
                     extent = adsk.fusion.DistanceExtentDefinition.create(dist)
-                    extInput.setOneSideExtent(extent, direction)
+                    extInput.setOneSideExtent(extent, cutDirection)
 
                 extInput.participantBodies = [targetBody]
                 extrude = extrudes.add(extInput)

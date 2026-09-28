@@ -86,7 +86,7 @@ The config file is organized into four sections:
 | `tm_state.py` | Global state: `INSERT_SPECS` dict, `CONFIG` dict, tolerances, UI reference |
 | `tm_config.py` | Config file I/O: load/save `config.ini`, default insert specs |
 | `tm_helpers.py` | Utilities: `isSamePoint()`, `isSameCircle()`, `calc_blind_hole_depth()`, `calc_blind_hole_depth_mm()`, `log()` |
-| `tm_geometry.py` | Core geometry: `findProfileForCircle()`, `findExtrudeDirectionFromSketch()`, `findChamferEdge()`, `addChamferToEdge()`, `findDistanceThroughBody()`, `addBottomRadiusToBlindHole()` |
+| `tm_geometry.py` | Core geometry: `findProfileForCircle()`, `resolveSketchPlane()`, `alignExtrudeDirection()`, `findExtrudeDirectionFromSketch()`, `findChamferEdge()`, `addChamferToEdge()`, `findDistanceThroughBody()`, `addBottomRadiusToBlindHole()` |
 | `tm_execute.py` | `CommandExecuteHandler.notify()` — orchestrates the hole creation loop |
 | `tm_ui.py` | `CommandCreatedHandler`, `InputChangedHandler`, `ValidateInputsHandler` |
 | `tm_debug_export.py` | JSON export of sketch profiles/curves for debugging and test fixtures |
@@ -97,7 +97,8 @@ User clicks ThreadMeister button
   → CommandCreatedHandler: build UI dialog
   → User selects body, points, options, clicks OK
   → CommandExecuteHandler: for each selected point:
-      ├─ Create clean temp sketch via addWithoutEdges(face)
+      ├─ resolveSketchPlane(parentSketch) → plane or face (ADR-0002)
+      ├─ Create clean temp sketch via addWithoutEdges(plane)
       ├─ Project original sketch point into temp sketch
       ├─ Draw bore circle, constrain to projected point
       ├─ findProfileForCircle(tempSketch, circle) → select profile

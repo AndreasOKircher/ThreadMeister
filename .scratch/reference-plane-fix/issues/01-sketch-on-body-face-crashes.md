@@ -1,6 +1,8 @@
 # Bug: every run crashes when the Sketch Points lie in a sketch on a Body Face
 
-Status: ready-for-agent
+Status: ready-for-human
+
+> **Status note.** Code done and unit-tested; waiting for the manual Fusion smoke test listed under Verification.
 GitHub: https://github.com/AndreasOKircher/ThreadMeister/issues/1
 
 ## Symptom
@@ -94,4 +96,19 @@ None — can start immediately.
 
 ## Implementation Summary
 
-<Filled at issue close.>
+**Code done:** 2026-09-28, branch `reference-plane-fix-r1` (commit that flipped this issue to `ready-for-human`)
+
+- `core/tm_geometry.py`: `resolveSketchPlane()` reads `referencePlane` and, if Fusion
+  raises, falls back to `findFaceForSketchPlane()`. That searches the Target Body, then the
+  component's other bodies, for a planar face in the sketch plane (same normal preferred).
+  `alignExtrudeDirection()` flips the extrude direction for the cut only when the Temp
+  Sketch's normal is opposite to the Parent Sketch's.
+- `core/tm_execute.py`: uses both; `direction` for `findDistanceThroughBody` is unchanged;
+  no face found → per-point failure message instead of a traceback.
+- Tests: 14 new unit tests in `tests/test_sketch_plane.py`; suite 64 passed, 12 skipped.
+- Not unit-testable: `tm_execute.py` can't be imported under the `adsk` mock (its handler
+  subclasses a mocked Fusion class), so the "`direction` passed to `findDistanceThroughBody`
+  is never flipped" check is covered by the through-hole smoke test instead.
+- Assumption to confirm in Fusion: `addWithoutEdges()` accepts the face found at the end of
+  the timeline, and `BRepFace.evaluator.getNormalAtPoint()` returns the outward normal.
+- Manual Fusion smoke: **pending**.
