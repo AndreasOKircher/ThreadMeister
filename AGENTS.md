@@ -122,7 +122,10 @@ that links back to the GitHub issue; the `.scratch/` file is where the work is t
 - Stage selectively — only the issue's files. Never `git add -A`.
 - **Always ask before:** `git push`, force-push, history rewrites, deleting branches outside
   `/finish-feature`.
-- Skip the commit when tests fail or the issue is parked (`needs-info`, `ready-for-human`).
+- Issue code done but its manual Fusion smoke test still open → commit anyway with
+  `Status: ready-for-human`. After the user confirms the smoke test, flip it to `completed`
+  in a small follow-up commit (or inside `/finish-feature`).
+- Skip the commit only when tests fail or the issue is blocked on the reporter (`needs-info`).
 
 ### Triage labels
 

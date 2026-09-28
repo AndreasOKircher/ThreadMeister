@@ -20,11 +20,13 @@ face). Autodesk forum thread: "Sketch.referencePlane property functionality chan
 
 1. Keep reading `referencePlane` first — it still works for construction planes.
 2. If it raises, don't touch the timeline. Take the plane from the Parent Sketch's own
-   geometry (`sketch.transform` → origin + normal) and find the planar face of the Target
-   Body, as it is **now**, that lies in that plane with the same outward normal. Create the
-   Temp Sketch on that face.
-3. After creating the Temp Sketch, compare its normal with the Parent Sketch's normal and
-   flip the Extrude Direction if they are opposite.
+   geometry (`sketch.transform` → origin + normal) and find the planar face, as it is
+   **now**, that lies in that plane with a parallel outward normal — on the Target Body
+   first, then on the component's other bodies (the sketch may sit on another body's face).
+   Create the Temp Sketch on that face.
+3. After creating the Temp Sketch, compare its normal with the Parent Sketch's normal and,
+   if they are opposite, flip the direction used for the extrude cut only. Calculations that
+   work in the Parent Sketch's frame (through distance) keep the unflipped Extrude Direction.
 4. If no face matches, fail that Sketch Point with a clear message instead of a traceback.
 
 ## Alternatives rejected

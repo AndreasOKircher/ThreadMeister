@@ -91,7 +91,8 @@ At issue close, the same commit that contains the code must:
 ```
 
 Fusion-only behaviour can't be proven by pytest. If the manual smoke hasn't been done yet,
-park the issue at `ready-for-human` instead of `completed`.
+commit with `Status: ready-for-human` instead of `completed`; flip it to `completed` once the
+user confirms the smoke test.
 
 ## When a skill says "publish to the issue tracker"
 

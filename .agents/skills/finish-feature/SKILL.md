@@ -18,7 +18,8 @@ human checkpoint: the merge decision, made after code review.
 ### 1. Gate
 
 - Each in-round issue reads `Status: completed` with an `## Implementation Summary`.
-- Any issue whose Fusion smoke test is still open → **stop** and ask the user to run it.
+- Any issue at `ready-for-human` → ask the user to run its Fusion smoke test. Confirmed →
+  flip it to `completed` and commit. Not confirmed → **stop**.
 - `python -m pytest -q` — any failure → **stop**, report.
 - User-visible change → `docs/changelog.md` updated; version bumped in
   `ThreadMeister.manifest` and `manifest.json` if this round ships a release.

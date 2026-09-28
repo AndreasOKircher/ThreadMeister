@@ -40,31 +40,43 @@ Per ADR-0002, in a new helper in `core/tm_geometry.py` (e.g. `resolveSketchPlane
 
 1. `try: return parentSketch.referencePlane` — unchanged path for construction planes.
 2. On exception: origin + normal from `parentSketch.transform.getAsCoordinateSystem()`;
-   scan `targetBody.faces` for a planar face whose plane contains the origin and whose
-   outward normal is parallel to the sketch normal (prefer same direction). Return it.
+   scan for a planar face whose plane contains the origin and whose outward normal is
+   parallel to the sketch normal (prefer same direction). Search `targetBody.faces` first,
+   then the faces of the other bodies in `targetBody.parentComponent.bRepBodies` — the
+   Parent Sketch may sit on a face of a different body than the one being cut (this worked
+   in v1.2.0 and must keep working). Return the first match.
 3. None found → return `None`; `tm_execute.py` fails that point with
-   "Point N: could not find the sketch's face on the target body." and continues.
+   "Point N: could not find the sketch's face." and continues.
 
 In `core/tm_execute.py`:
 
 - Use the helper instead of line 68.
-- After `addWithoutEdges`, compare the Temp Sketch normal with the Parent Sketch normal; if
-  opposite, flip `direction` (it is computed from the Parent Sketch).
+- Keep `direction` exactly as today (computed from the Parent Sketch). It is also passed to
+  `findDistanceThroughBody()` (`tm_execute.py:124`), which interprets it against the Parent
+  Sketch's axis (`tm_geometry.py:436`) — so `direction` itself must **not** be flipped.
+- Add a separate `cutDirection` for the extrude only: after `addWithoutEdges`, compare the
+  Temp Sketch normal with the Parent Sketch normal; `cutDirection` = `direction` if they
+  match, the opposite enum value if not. Pass `cutDirection` to `setOneSideExtent()`
+  (both the blind and the through branch).
 
-Not changed: Extrude Direction, through-distance and chamfer logic (still use the Parent
-Sketch's transform).
+Not changed: how `direction` is computed, through-distance and chamfer logic (still use the
+Parent Sketch's transform).
 
 ## Verification
 
 - Unit tests (mocked faces) for the face lookup: coplanar same normal → found; coplanar
-  opposite normal → found as fallback; parallel but offset plane → rejected; no planar face
-  → `None`; `referencePlane` works → returned untouched.
+  opposite normal → found as fallback; parallel but offset plane → rejected; face only on
+  another body in the component → found; no planar face → `None`; `referencePlane` works →
+  returned untouched.
+- Unit test for `cutDirection`: same normals → unchanged, opposite normals → flipped, and
+  `direction` passed to `findDistanceThroughBody` is never flipped.
 - Manual Fusion smoke (deploy with `scripts\deploy.bat`):
   - point in sketch on a Body Face → Bore cut, blind and through;
   - point in sketch on XY plane → still works;
   - point in sketch on an offset plane → still works;
   - Chamfer + Bottom Radius on the face case;
-  - several points from two sketches on different faces in one run.
+  - several points from two sketches on different faces in one run;
+  - sketch on a face of body A, Target Body B (Bore goes into B).
 
 ## Out of scope
 

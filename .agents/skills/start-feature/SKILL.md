@@ -27,11 +27,18 @@ Not for docs-only / `.scratch/` edits — those go straight to `master`.
 
 `git status`. If dirty: commit, stash, or ask the user before continuing.
 
-### 1. Pick the round number N
+### 1. Switch to `master`
 
-`git branch --list '<slug>-r*'` — first round is `r1`, an extension is the next integer.
+`git checkout master`. The claim commit in step 3 must land on `master`, and the branch in
+step 4 is cut from it.
 
-### 2. Claim on `master` first
+### 2. Pick the round number N
+
+Read `round:` from `.scratch/<slug>/.feature-status.md` — merged branches are deleted by
+`/finish-feature`, so `git branch` can't tell you the history. No tracker yet → `r1`;
+otherwise the next integer.
+
+### 3. Claim on `master` first
 
 1. For each in-round issue, flip `Status:` from `ready-for-agent` to `on-branch`.
 2. Create/update `.scratch/<slug>/.feature-status.md`:
@@ -47,19 +54,19 @@ Not for docs-only / `.scratch/` edits — those go straight to `master`.
 3. Commit on `master`:
    `git add .scratch/<slug>/ && git commit -m "start(<slug>): claim round rN -> on-branch"`
 
-### 3. Cut the branch from local `master`
+### 4. Cut the branch from local `master`
 
 ```
-git checkout master && git checkout -b <slug>-rN
+git checkout -b <slug>-rN
 ```
 
-### 4. Work
+### 5. Work
 
 Implement every issue on this branch. For each issue: `/tdd` for the Fusion-free logic,
-`python -m pytest -q` green, then flip `Status: completed`, add the Implementation Summary,
-and commit (one commit per issue). If an issue still needs a manual Fusion smoke test, set
-`ready-for-human` instead and tell the user what to check. When all issues are done, run
-`/finish-feature`.
+`python -m pytest -q` green, then add the Implementation Summary and commit (one commit per
+issue). Status in that commit: `completed` if nothing is left to check; `ready-for-human` if a
+manual Fusion smoke test is still open — tell the user what to check. When all issues are
+done, run `/finish-feature`.
 
 ## Report
 
