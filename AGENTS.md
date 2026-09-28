@@ -120,8 +120,10 @@ that links back to the GitHub issue; the `.scratch/` file is where the work is t
   One commit per issue close, bundling the code, the `Status: completed` flip, and the
   `## Implementation Summary`.
 - Stage selectively — only the issue's files. Never `git add -A`.
-- **Always ask before:** `git push`, force-push, history rewrites, deleting branches outside
-  `/finish-feature`.
+- **Pushing a feature branch** (`<slug>-rN`, or the branch a cloud session was assigned) needs
+  no approval — it's how code reaches the user's PC for Fusion smoke tests.
+- **Always ask before:** pushing to `master`, force-push, history rewrites, deleting branches
+  outside `/finish-feature`.
 - Issue code done but its manual Fusion smoke test still open → commit anyway with
   `Status: ready-for-human`. After the user confirms the smoke test, flip it to `completed`
   in a small follow-up commit (or inside `/finish-feature`).

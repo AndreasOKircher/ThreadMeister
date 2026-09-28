@@ -30,7 +30,7 @@ Before writing an issue, read the most recent sibling issues and copy the struct
   `master`.
 - **Merge is agent-executed, human-gated.** `/finish-feature` runs the tests, runs
   `/code-review`, asks *merge now?*, then squash-merges, re-runs tests, and flips the tracker.
-  Agents never `git push` without approval.
+  Agents may push feature branches freely; pushing `master` needs approval.
 
 ### Status-flip timing
 

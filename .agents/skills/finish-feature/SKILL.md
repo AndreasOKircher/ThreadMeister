@@ -1,6 +1,6 @@
 ---
 name: finish-feature
-description: Close out a feature round opened by /start-feature. Runs the full test suite, auto-runs /code-review and triages its findings, then on a SINGLE human merge-approval squash-merges into master, re-runs the tests, flips the tracker, and deletes the branch. Asks before pushing. Use when all of a feature's issues are implemented on its branch.
+description: Close out a feature round opened by /start-feature. Runs the full test suite, auto-runs /code-review and triages its findings, then on a SINGLE human merge-approval squash-merges into master, re-runs the tests, flips the tracker, and deletes the branch. Asks before pushing master. Use when all of a feature's issues are implemented on its branch.
 ---
 
 # Finish Feature
@@ -55,7 +55,7 @@ python -m pytest -q
 
 ### 6. Push
 
-Never `git push` without explicit approval.
+Never push `master` without explicit approval. (Feature branches may be pushed freely.)
 
 ## Report
 
