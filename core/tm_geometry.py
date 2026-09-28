@@ -10,6 +10,10 @@ import tm_state
 # Profile point margin: profiles must have ALL endpoints within circle_radius * (1 + this margin)
 PROFILE_POINT_MARGIN = 0.05
 
+# Sketch plane matching (cm / unit-vector tolerance)
+PLANE_DISTANCE_TOL = 1e-4
+PLANE_NORMAL_TOL = 1e-6
+
 
 def _filter_by_area(sketch, target_area):
     """
@@ -254,6 +258,106 @@ def findProfileForCircle(sketch, target_circle):
     for prof in best_profiles:
         coll.add(prof)
     return coll
+
+
+def _dot(a, b):
+    return a.x * b.x + a.y * b.y + a.z * b.z
+
+
+def _sketchNormal(sketch):
+    """Return (origin, zAxis) of the sketch plane in model space."""
+    (origin, xAxis, yAxis, zAxis) = sketch.transform.getAsCoordinateSystem()
+    return origin, zAxis
+
+
+def _faceAlignment(face, origin, normal):
+    """
+    Compare a face with the plane through `origin` with `normal`.
+
+    Returns:
+        1 if the face is planar, lies in that plane and its normal points the same way,
+        -1 if it lies in that plane with the opposite normal,
+        0 otherwise.
+    """
+    if face.geometry.surfaceType != adsk.core.SurfaceTypes.PlaneSurfaceType:
+        return 0
+
+    pointOnFace = face.pointOnFace
+    ok, faceNormal = face.evaluator.getNormalAtPoint(pointOnFace)
+    if not ok:
+        return 0
+
+    dot = _dot(faceNormal, normal) / (faceNormal.length * normal.length)
+    if abs(abs(dot) - 1.0) > PLANE_NORMAL_TOL:
+        return 0
+
+    distance = ((origin.x - pointOnFace.x) * faceNormal.x +
+                (origin.y - pointOnFace.y) * faceNormal.y +
+                (origin.z - pointOnFace.z) * faceNormal.z) / faceNormal.length
+    if abs(distance) > PLANE_DISTANCE_TOL:
+        return 0
+
+    return 1 if dot > 0 else -1
+
+
+def findFaceForSketchPlane(sketch, targetBody):
+    """
+    Find the planar body face the sketch lies on, as it exists at the end of the timeline.
+
+    Searches the Target Body first, then the other bodies of its component (the sketch
+    may sit on a face of another body). A face with the same normal as the sketch wins
+    over one with the opposite normal.
+
+    Returns:
+        BRepFace, or None if no face lies in the sketch plane
+    """
+    origin, normal = _sketchNormal(sketch)
+
+    bodies = [targetBody]
+    for body in targetBody.parentComponent.bRepBodies:
+        if body != targetBody:
+            bodies.append(body)
+
+    opposite = None
+    for body in bodies:
+        for face in body.faces:
+            alignment = _faceAlignment(face, origin, normal)
+            if alignment == 1:
+                return face
+            if alignment == -1 and opposite is None:
+                opposite = face
+    return opposite
+
+
+def resolveSketchPlane(sketch, targetBody):
+    """
+    Return a plane or face to create the Temp Sketch on (ADR-0002).
+
+    Sketch.referencePlane still works for construction planes, but raises for sketches
+    on a body face since a Fusion update in 2026. In that case, look the face up by
+    geometry instead of rolling the timeline back.
+
+    Returns:
+        ConstructionPlane or BRepFace, or None if the sketch's face can't be found
+    """
+    try:
+        return sketch.referencePlane
+    except Exception:
+        return findFaceForSketchPlane(sketch, targetBody)
+
+
+def alignExtrudeDirection(direction, parentSketch, tempSketch):
+    """
+    Translate an extrude direction computed against the Parent Sketch into the
+    Temp Sketch's frame. They differ when the Temp Sketch's normal is flipped.
+    """
+    _, parentNormal = _sketchNormal(parentSketch)
+    _, tempNormal = _sketchNormal(tempSketch)
+    if _dot(parentNormal, tempNormal) >= 0:
+        return direction
+    if direction == adsk.fusion.ExtentDirections.PositiveExtentDirection:
+        return adsk.fusion.ExtentDirections.NegativeExtentDirection
+    return adsk.fusion.ExtentDirections.PositiveExtentDirection
 
 
 def findExtrudeDirectionFromSketch(sketch, circleCenter, targetBody):

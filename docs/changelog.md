@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.3 — 2026-09-28 — Fix for sketches on body faces
+- **Fixed** (GitHub #1): every run failed with `RuntimeError: 3 : referencePlane is a BRefFace - need to roll timeline back before sketch` when the Sketch Points were in a sketch placed directly on a body face. Caused by a Fusion update that changed `Sketch.referencePlane`. ThreadMeister now finds the sketch's face by geometry instead (ADR-0002).
+- If the face can't be found, that point fails with a clear message instead of a traceback.
+
 ## 1.2.2 — 2026-03-16 — Config restructure & depth fix
 - **Config.ini reorganized** into 4 sections: `[Settings]`, `[Inserts]`, `[UI State]`, `[Developer]`
 - Auto-migration: old single-section configs are upgraded automatically on load

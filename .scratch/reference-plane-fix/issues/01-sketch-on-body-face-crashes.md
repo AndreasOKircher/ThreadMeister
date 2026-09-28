@@ -1,6 +1,7 @@
 # Bug: every run crashes when the Sketch Points lie in a sketch on a Body Face
 
-Status: ready-for-agent
+Status: completed
+
 GitHub: https://github.com/AndreasOKircher/ThreadMeister/issues/1
 
 ## Symptom
@@ -43,8 +44,9 @@ Per ADR-0002, in a new helper in `core/tm_geometry.py` (e.g. `resolveSketchPlane
    scan for a planar face whose plane contains the origin and whose outward normal is
    parallel to the sketch normal (prefer same direction). Search `targetBody.faces` first,
    then the faces of the other bodies in `targetBody.parentComponent.bRepBodies` — the
-   Parent Sketch may sit on a face of a different body than the one being cut (this worked
-   in v1.2.0 and must keep working). Return the first match.
+   Parent Sketch may sit on a face of a different body than the one being cut. Return the
+   first match. (Cutting body B from a sketch on body A still needs B to touch the sketch
+   plane — see "Expected limitations" below.)
 3. None found → return `None`; `tm_execute.py` fails that point with
    "Point N: could not find the sketch's face." and continues.
 
@@ -94,4 +96,35 @@ None — can start immediately.
 
 ## Implementation Summary
 
-<Filled at issue close.>
+**Code done:** 2026-09-28, branch `reference-plane-fix-r1` (commit that flipped this issue to `ready-for-human`)
+
+- `core/tm_geometry.py`: `resolveSketchPlane()` reads `referencePlane` and, if Fusion
+  raises, falls back to `findFaceForSketchPlane()`. That searches the Target Body, then the
+  component's other bodies, for a planar face in the sketch plane (same normal preferred).
+  `alignExtrudeDirection()` flips the extrude direction for the cut only when the Temp
+  Sketch's normal is opposite to the Parent Sketch's.
+- `core/tm_execute.py`: uses both; `direction` for `findDistanceThroughBody` is unchanged;
+  no face found → per-point failure message instead of a traceback.
+- Tests: 14 new unit tests in `tests/test_sketch_plane.py`; suite 64 passed, 12 skipped.
+- Not unit-testable: `tm_execute.py` can't be imported under the `adsk` mock (its handler
+  subclasses a mocked Fusion class), so the "`direction` passed to `findDistanceThroughBody`
+  is never flipped" check is covered by the through-hole smoke test instead.
+- Assumption to confirm in Fusion: `addWithoutEdges()` accepts the face found at the end of
+  the timeline, and `BRepFace.evaluator.getNormalAtPoint()` returns the outward normal.
+- Manual Fusion smoke (maintainer, 2026-09-28, Fusion with dev deploy 1.2.3): face sketch
+  blind ✅, face sketch through ✅, XY plane ✅, offset plane with offset 0 ✅, Chamfer +
+  Bottom Radius ✅, several points on two faces ✅.
+- Both remaining smoke cases fail with "Could not determine extrusion direction", which is
+  expected — see "Expected limitations".
+
+## Expected limitations (confirmed 2026-09-28, not a regression)
+
+`findExtrudeDirectionFromSketch()` (unchanged since v1.2.0) probes the Target Body only
+0.1–2 mm on either side of the Sketch Point. So a Bore needs a sketch plane that touches the
+Target Body:
+
+- **Offset plane with offset ≠ 0** → fails. Accepted: a Bore starts at the part's surface;
+  the error message already says so. No follow-up issue (maintainer decision).
+- **Sketch on body A, Target Body B not touching that plane** → fails the same way. The new
+  face lookup itself works here (it found A's face).
+- The duplicate-install button conflict found during testing is not part of this issue.
