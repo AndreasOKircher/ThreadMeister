@@ -1,9 +1,7 @@
 # Newer ThreadMeister runs its own code next to an older installed copy
 
-Status: ready-for-human
+Status: completed
 GitHub: https://github.com/AndreasOKircher/ThreadMeister/issues/1
-
-> **Status note.** Code done and unit-tested; waiting for the manual Fusion smoke test below.
 
 ## Parent
 
@@ -35,10 +33,10 @@ deletes the button by ID — 1.2.4's by then. Restarting Fusion (as the README s
 - [x] Simulation (two copies at different paths, loaded as path-named packages): each copy
       loads its own `core/tm_*.py`, no bare `tm_*` in `sys.modules`.
 - [x] README troubleshooting + changelog; version 1.2.4; ADR-0003.
-- [ ] Manual Fusion smoke, **only 1.2.4 installed**: add-in loads, face-sketch Bore works.
-- [ ] Manual Fusion smoke, **old App Store copy + 1.2.4 both enabled at startup**, restart
-      Fusion: face-sketch Bore works (no "referencePlane is a BRefFace" error).
-- [ ] Text Commands check: `[k for k in sys.modules if 'tm_' in k]` shows names starting
+- [x] Add-in loads with relative imports and the face-sketch Bore works (covered by the next check).
+- [x] Manual Fusion smoke, **old App Store copy (1.2.0) + 1.2.4 both enabled at startup**,
+      restart Fusion: no error message at all, face-sketch Bore works, 1.2.4 code runs.
+- [ ] (optional, not run) Text Commands check: `[k for k in sys.modules if 'tm_' in k]` shows names starting
       with `__main__…ThreadMeister_py.core.` for 1.2.4.
 
 ## Blocked by
@@ -53,4 +51,6 @@ None.
 - Folder-scan warning from the first commit on this branch removed again (ADR-0003,
   "Alternatives rejected").
 - Tests: import paths updated; suite 64 passed, 12 skipped.
-- Manual Fusion smoke: **pending**.
+- Manual Fusion smoke (maintainer, 2026-09-29): 1.2.0 (App Store) and 1.2.4 (dev deploy)
+  both set to run on startup → no error dialog, ThreadMeister works and runs 1.2.4. Confirms
+  that Fusion loads the entry file as a package (relative imports work).
