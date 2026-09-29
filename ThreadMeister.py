@@ -35,22 +35,13 @@ Known Issues:
 """
 import traceback
 import os
-import sys
 
-# Add the add-in directory to sys.path so local modules are importable
-_addin_path = os.path.dirname(os.path.realpath(__file__))
-if _addin_path not in sys.path:
-    sys.path.insert(0, _addin_path)
-
-# Add the core subdirectory to sys.path for module imports
-_core_path = os.path.join(_addin_path, 'core')
-if _core_path not in sys.path:
-    sys.path.insert(0, _core_path)
-
-import tm_state
-import tm_config
-from tm_ui import CommandCreatedHandler
-from tm_install import find_other_installs, get_install_search_dirs, duplicate_install_message
+# Relative imports: Fusion loads every add-in under a name derived from its install path,
+# so our modules stay separate from those of any other installed ThreadMeister copy
+# (.scratch/duplicate-install/). Don't add core/ to sys.path.
+from .core import tm_state
+from .core import tm_config
+from .core.tm_ui import CommandCreatedHandler
 
 
 def run(context):
@@ -90,10 +81,6 @@ def run(context):
             buttonControl.isPromotedByDefault = True
         else:
             tm_state._ui.messageBox(f'Could not find panel: {tm_state.PANEL_ID}')
-
-        others = find_other_installs(addon_path, get_install_search_dirs())
-        if others:
-            tm_state._ui.messageBox(duplicate_install_message(others), tm_state.CMD_NAME)
 
     except Exception:
         tm_state._ui.messageBox('Failed to load add-in:\n{}'.format(traceback.format_exc()))

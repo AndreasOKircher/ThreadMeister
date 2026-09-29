@@ -13,7 +13,7 @@ import time
 import math
 import adsk.core
 import adsk.fusion
-from tm_geometry import findProfileForCircle
+from .tm_geometry import findProfileForCircle
 
 
 def _debug_log(msg):

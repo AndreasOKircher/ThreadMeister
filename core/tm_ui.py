@@ -5,10 +5,10 @@ Handles CommandCreated, InputChanged, ValidateInputs events and
 the updateInfoText helper that refreshes the info text box.
 """
 import adsk.core, adsk.fusion, traceback
-import tm_state
-import tm_config
-from tm_helpers import calc_blind_hole_depth_mm
-from tm_execute import CommandExecuteHandler
+from . import tm_state
+from . import tm_config
+from .tm_helpers import calc_blind_hole_depth_mm
+from .tm_execute import CommandExecuteHandler
 
 
 class CommandCreatedHandler(adsk.core.CommandCreatedEventHandler):

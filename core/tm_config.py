@@ -11,7 +11,7 @@ Config sections:
 """
 import os
 import configparser
-import tm_state
+from . import tm_state
 
 
 def _get_config_path():

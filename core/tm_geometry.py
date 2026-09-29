@@ -5,7 +5,7 @@ chamfer, fillet, and through-body distance.
 import adsk.core, adsk.fusion, traceback
 import math
 from itertools import combinations
-import tm_state
+from . import tm_state
 
 # Profile point margin: profiles must have ALL endpoints within circle_radius * (1 + this margin)
 PROFILE_POINT_MARGIN = 0.05

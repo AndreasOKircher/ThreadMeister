@@ -16,7 +16,7 @@ import glob
 from unittest.mock import MagicMock
 from types import SimpleNamespace
 
-import tm_geometry
+from core import tm_geometry
 
 
 # ===== Helper Functions =====

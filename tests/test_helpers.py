@@ -4,7 +4,7 @@ Unit tests for tm_helpers.py functions.
 
 import pytest
 from types import SimpleNamespace
-from tm_helpers import isSamePoint, isSameCircle, calc_blind_hole_depth
+from core.tm_helpers import isSamePoint, isSameCircle, calc_blind_hole_depth
 
 
 class TestIsSamePoint:

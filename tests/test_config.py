@@ -5,14 +5,14 @@ Unit tests for tm_config.py functions.
 import pytest
 import os
 import configparser
-from tm_config import (
+from core.tm_config import (
     get_default_inserts,
     load_config,
     save_last_selected_insert,
     save_checkbox_states,
     create_default_config
 )
-import tm_state
+from core import tm_state
 
 
 class TestGetDefaultInserts:

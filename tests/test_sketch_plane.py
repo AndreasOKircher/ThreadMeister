@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, PropertyMock
 
 import adsk.core
 import adsk.fusion
-from tm_geometry import (
+from core.tm_geometry import (
     resolveSketchPlane,
     findFaceForSketchPlane,
     alignExtrudeDirection,

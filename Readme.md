@@ -188,13 +188,13 @@ M3 x 6mm (custom) = 4.6, 6.0, 1.8
 **Two ThreadMeister entries in Utilities → Add-Ins, or an error from an old version:**
 - You have more than one copy installed (e.g. App Store plus manual install)
 - Switch the older one off and uncheck **Run on Startup**, then restart Fusion
-- Since v1.2.4 ThreadMeister tells you at startup where the other copy is installed
+- Since v1.2.4 the newest copy works even if the old one is still enabled, but the old one may show an error at startup until you disable it
 
 
 ## Changelog
 
 ### v1.2.4 — 2026-09-29
-- Fixed: an older installed copy could run instead of the new version; ThreadMeister now takes over its button and tells you where the other copy is
+- Fixed: an older installed copy could run instead of the new version; ThreadMeister now takes over the button and always runs its own code
 
 ### v1.2.3 — 2026-09-28
 - Fixed: runs failed with "referencePlane is a BRefFace" when the sketch was on a body face (GitHub #1)
