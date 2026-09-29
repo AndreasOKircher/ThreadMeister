@@ -10,7 +10,7 @@ using the dimensional specifications from CNC Kitchen.
 Author: Andreas Kircher (Andreas.O.Kircher@gmail.com)
 Created with assistance from: Claude (Anthropic) / Perplexity
 Insert specifications from: CNC Kitchen (cnckitchen.com)
-Version: 1.2.3
+Version: 1.2.4
 
 Features:
 - Creates heat-set insert holes at sketch points
@@ -50,6 +50,7 @@ if _core_path not in sys.path:
 import tm_state
 import tm_config
 from tm_ui import CommandCreatedHandler
+from tm_install import find_other_installs, get_install_search_dirs, duplicate_install_message
 
 
 def run(context):
@@ -60,6 +61,16 @@ def run(context):
         cmdDefs = tm_state._ui.commandDefinitions
         addon_path = os.path.dirname(os.path.realpath(__file__))
         resources_path = os.path.join(addon_path, 'resources', 'icons')
+
+        # Another ThreadMeister copy loaded first and owns the button: take it over
+        existingDef = cmdDefs.itemById(tm_state.CMD_ID)
+        if existingDef:
+            panel = tm_state._ui.allToolbarPanels.itemById(tm_state.PANEL_ID)
+            if panel:
+                existingControl = panel.controls.itemById(tm_state.CMD_ID)
+                if existingControl:
+                    existingControl.deleteMe()
+            existingDef.deleteMe()
 
         buttonDef = cmdDefs.addButtonDefinition(
             tm_state.CMD_ID,
@@ -79,6 +90,10 @@ def run(context):
             buttonControl.isPromotedByDefault = True
         else:
             tm_state._ui.messageBox(f'Could not find panel: {tm_state.PANEL_ID}')
+
+        others = find_other_installs(addon_path, get_install_search_dirs())
+        if others:
+            tm_state._ui.messageBox(duplicate_install_message(others), tm_state.CMD_NAME)
 
     except Exception:
         tm_state._ui.messageBox('Failed to load add-in:\n{}'.format(traceback.format_exc()))

@@ -61,7 +61,7 @@ Tired of googling insert dimensions every time you need a bore for a heat-set in
 7. Optional: Check **Run on Startup** to load automatically
 
 ### Autodesk App Store Installation
-ThreadMeister is also available on the Autodesk App Store (pending approval).  
+ThreadMeister is also available on the Autodesk App Store.  
 The App Store version installs automatically and updates cleanly.
 
 
@@ -185,8 +185,16 @@ M3 x 6mm (custom) = 4.6, 6.0, 1.8
 **Chamfer or fillet radius missing:**
 - The chamfer and fillet radius can be selected in the config menu
 
+**Two ThreadMeister entries in Utilities → Add-Ins, or an error from an old version:**
+- You have more than one copy installed (e.g. App Store plus manual install)
+- Switch the older one off and uncheck **Run on Startup**, then restart Fusion
+- Since v1.2.4 ThreadMeister tells you at startup where the other copy is installed
+
 
 ## Changelog
+
+### v1.2.4 — 2026-09-29
+- Fixed: an older installed copy could run instead of the new version; ThreadMeister now takes over its button and tells you where the other copy is
 
 ### v1.2.3 — 2026-09-28
 - Fixed: runs failed with "referencePlane is a BRefFace" when the sketch was on a body face (GitHub #1)
