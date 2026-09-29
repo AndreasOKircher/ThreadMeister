@@ -10,7 +10,7 @@ using the dimensional specifications from CNC Kitchen.
 Author: Andreas Kircher (Andreas.O.Kircher@gmail.com)
 Created with assistance from: Claude (Anthropic) / Perplexity
 Insert specifications from: CNC Kitchen (cnckitchen.com)
-Version: 1.2.3
+Version: 1.2.4
 
 Features:
 - Creates heat-set insert holes at sketch points
@@ -35,21 +35,13 @@ Known Issues:
 """
 import traceback
 import os
-import sys
 
-# Add the add-in directory to sys.path so local modules are importable
-_addin_path = os.path.dirname(os.path.realpath(__file__))
-if _addin_path not in sys.path:
-    sys.path.insert(0, _addin_path)
-
-# Add the core subdirectory to sys.path for module imports
-_core_path = os.path.join(_addin_path, 'core')
-if _core_path not in sys.path:
-    sys.path.insert(0, _core_path)
-
-import tm_state
-import tm_config
-from tm_ui import CommandCreatedHandler
+# Relative imports: Fusion loads every add-in under a name derived from its install path,
+# so our modules stay separate from those of any other installed ThreadMeister copy
+# (.scratch/duplicate-install/). Don't add core/ to sys.path.
+from .core import tm_state
+from .core import tm_config
+from .core.tm_ui import CommandCreatedHandler
 
 
 def run(context):
@@ -60,6 +52,16 @@ def run(context):
         cmdDefs = tm_state._ui.commandDefinitions
         addon_path = os.path.dirname(os.path.realpath(__file__))
         resources_path = os.path.join(addon_path, 'resources', 'icons')
+
+        # Another ThreadMeister copy loaded first and owns the button: take it over
+        existingDef = cmdDefs.itemById(tm_state.CMD_ID)
+        if existingDef:
+            panel = tm_state._ui.allToolbarPanels.itemById(tm_state.PANEL_ID)
+            if panel:
+                existingControl = panel.controls.itemById(tm_state.CMD_ID)
+                if existingControl:
+                    existingControl.deleteMe()
+            existingDef.deleteMe()
 
         buttonDef = cmdDefs.addButtonDefinition(
             tm_state.CMD_ID,

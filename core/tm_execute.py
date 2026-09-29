@@ -2,10 +2,10 @@
 tm_execute.py – CommandExecuteHandler: orchestrates the hole creation loop.
 """
 import adsk.core, adsk.fusion, traceback, os
-import tm_state
-import tm_config
-from tm_helpers import calc_blind_hole_depth_mm
-from tm_geometry import (
+from . import tm_state
+from . import tm_config
+from .tm_helpers import calc_blind_hole_depth_mm
+from .tm_geometry import (
     findProfileForCircle,
     resolveSketchPlane,
     alignExtrudeDirection,
@@ -96,7 +96,7 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
                 # Export debug JSON if enabled
                 if shouldExport:
                     try:
-                        from tm_debug_export import export_sketch_data
+                        from .tm_debug_export import export_sketch_data
                         export_dir = os.path.join(
                             os.path.dirname(os.path.dirname(__file__)), 'debug_exports')
                         os.makedirs(export_dir, exist_ok=True)

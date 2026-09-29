@@ -4,7 +4,7 @@ tm_helpers.py – Utility functions: geometry comparisons, logging.
 Also exports calc_blind_hole_depth() for use in tm_execute and tests.
 """
 import adsk.core
-import tm_state
+from . import tm_state
 
 
 def isSamePoint(p1, p2, tol=None):

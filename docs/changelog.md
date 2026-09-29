@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.4 — 2026-09-29 — Works next to an older installed copy
+- **Fixed:** with two ThreadMeister copies installed (e.g. the App Store version plus a manual install), the older copy could own the toolbar button and even supply its old code, so the fix from 1.2.3 never ran. 1.2.4 removes an existing ThreadMeister button before creating its own (Autodesk's recommended pattern) and loads its modules with relative imports, so it always runs its own code (ADR-0003).
+- An older copy loading after 1.2.4 may still show its own "command definition already exists" error at startup — disable the older copy (see README → Troubleshooting).
+
 ## 1.2.3 — 2026-09-28 — Fix for sketches on body faces
 - **Fixed** (GitHub #1): every run failed with `RuntimeError: 3 : referencePlane is a BRefFace - need to roll timeline back before sketch` when the Sketch Points were in a sketch placed directly on a body face. Caused by a Fusion update that changed `Sketch.referencePlane`. ThreadMeister now finds the sketch's face by geometry instead (ADR-0002).
 - If the face can't be found, that point fails with a clear message instead of a traceback.

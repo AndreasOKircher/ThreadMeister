@@ -6,7 +6,7 @@ import pytest
 import math
 from types import SimpleNamespace
 from unittest.mock import MagicMock
-from tm_geometry import (
+from core.tm_geometry import (
     _filter_by_area,
     _filter_by_centroid,
     _filter_by_bounding_box,

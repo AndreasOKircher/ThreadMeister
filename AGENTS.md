@@ -56,6 +56,9 @@ Use the canonical names from `CONTEXT.md`. Don't invent synonyms (e.g. say **Bor
   `isinstance` checks to tell mocks from real collections (see `tests/test_profile_selection.py`).
 - **`Sketch.referencePlane` is unsafe for sketches on a body face** (Fusion changed it after
   March 2026 — GitHub issue #1, ADR-0002). Don't add new calls to it.
+- **Imports are relative** (`from . import tm_state`, `from .core import …`). Fusion runs all
+  add-ins in one Python; bare names like `tm_state` collide with other installed copies
+  (ADR-0003). Never add folders to `sys.path`. Tests import the package as `core.tm_*`.
 - **Units:** Fusion's API works in **cm**; Insert Specs and `config.ini` are in **mm**.
   Convert at the call site (`/ 10.0`).
 - **The installed add-in is not your working copy.** Fusion runs whatever is in its AddIns /

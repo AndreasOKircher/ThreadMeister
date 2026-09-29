@@ -34,19 +34,20 @@ sys.modules['adsk'] = adsk_mock
 sys.modules['adsk.core'] = adsk_mock.core
 sys.modules['adsk.fusion'] = adsk_mock.fusion
 
-# Add core/ to path so we can import tm_* modules
-_core_path = os.path.join(os.path.dirname(__file__), '..', 'core')
-if _core_path not in sys.path:
-    sys.path.insert(0, _core_path)
+# Add the repo root to path so tests import the add-in modules as the `core` package
+# (they use relative imports, like Fusion loads them)
+_root_path = os.path.join(os.path.dirname(__file__), '..')
+if _root_path not in sys.path:
+    sys.path.insert(0, _root_path)
 
 # Now safe to import tm_state and suppress messageBox calls
-import tm_state
+from core import tm_state
 tm_state._ui = None
 # Logging disabled by default - set to True to see algorithm debug output
 tm_state.CONFIG['enable_logging'] = False
 
 # Override log function to print to stdout during tests (optional for debugging)
-import tm_helpers
+from core import tm_helpers
 _original_log = tm_helpers.log
 def debug_log(msg):
     """Log to stdout for debugging tests."""
