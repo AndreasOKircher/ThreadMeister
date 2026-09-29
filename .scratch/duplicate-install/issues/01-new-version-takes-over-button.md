@@ -26,6 +26,9 @@ GitHub: https://github.com/AndreasOKircher/ThreadMeister/issues/1
 | old copy first, 1.2.4 second | 1.2.4 removes the old button, creates its own, runs its own code |
 | 1.2.4 first, old copy second | old copy shows "already exists" at startup; 1.2.4 keeps the button |
 
+Known edge: stopping/disabling the old copy while Fusion runs calls its `stop()`, which
+deletes the button by ID — 1.2.4's by then. Restarting Fusion (as the README says) restores it.
+
 ## Acceptance criteria
 
 - [x] `python -m pytest -q` passes (64 passed, 12 skipped).
