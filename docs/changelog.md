@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.5 — 2026-10-07 — Auto-load after installation
+- **Fixed** (App Store review): the add-in did not start automatically after installation — `runOnStartup` was `false` in both manifests, so a fresh install required manually starting it in Scripts and Add-Ins. Now `true` in `ThreadMeister.manifest` and `manifest.json`.
+
 ## 1.2.4 — 2026-09-29 — Works next to an older installed copy
 - **Fixed:** with two ThreadMeister copies installed (e.g. the App Store version plus a manual install), the older copy could own the toolbar button and even supply its old code, so the fix from 1.2.3 never ran. 1.2.4 removes an existing ThreadMeister button before creating its own (Autodesk's recommended pattern) and loads its modules with relative imports, so it always runs its own code (ADR-0003).
 - An older copy loading after 1.2.4 may still show its own "command definition already exists" error at startup — disable the older copy (see README → Troubleshooting).
