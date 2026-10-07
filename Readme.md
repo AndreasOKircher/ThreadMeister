@@ -193,6 +193,9 @@ M3 x 6mm (custom) = 4.6, 6.0, 1.8
 
 ## Changelog
 
+### v1.2.5 — 2026-10-07
+- Fixed: add-in now loads automatically when Fusion starts after installation (`runOnStartup` was disabled in the manifests)
+
 ### v1.2.4 — 2026-09-29
 - Fixed: an older installed copy could run instead of the new version; ThreadMeister now takes over the button and always runs its own code
 
