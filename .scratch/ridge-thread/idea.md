@@ -24,10 +24,32 @@ Ridge"). Dimension research: [research.md](research.md).
 - Through-hole depth is a fixed number measured once; it does not update when the point moves
   (same for standard holes).
 
+## Test results
+
+2026-10-15, user's own print tests, M3 / M4 / M5, fork default parameters vs. ridge diameter
++0.2 mm (arc distance unchanged):
+
+- +0.2 mm ridge diameter gave higher strength, clearly at least for M3. M4 / M5: not yet clear.
+- Effect of +0.2 with the same arc distance: each ridge reaches 0.1 further in, so the inner
+  diameter at the ridges drops by 0.2 (calculated from the fork's table, research.md Q3):
+
+  | Size | Inner Ø default | Inner Ø +0.2 | Tap drill (D−P) | D1 | D2 |
+  |---|---|---|---|---|---|
+  | M3 | 2.60 | 2.40 | 2.50 | 2.459 | 2.675 |
+  | M4 | 3.50 | 3.30 | 3.30 | 3.242 | 3.545 |
+  | M5 | 4.50 | 4.30 | 4.20 | 4.134 | 4.480 |
+
+- So the stronger M3 version sits below the tap drill, near D1, not at D2. That matches Roland
+  Smith's M3 crush ribs (ridges down to Ø2.4, research.md Q2).
+- Setup: ASA, 3 perimeters, 0.2 mm layer height. Layers at 90° to the bore axis (bore printed
+  vertically), so the layers run roughly parallel to the thread.
+- Still to record: printer, test method, numbers. Horizontal bores not tested yet.
+
 ## Open questions
 
 - Size rule: inner diameter at the ridges ≈ pitch diameter D2 (what the fork's table does), or
   test-based values per size? See research.md, Q3. Only M3 has a public source (Thomas's model).
+  First tests point to a smaller inner Ø (see Test results).
 - Ridge count: always 3 (Thomas; easy "one ridge down" print orientation) or more above M4?
 - Lead-in: chamfer on the ridge top edges (fork, 78°) or a swept taper (Thomas, 0.3 × 1.5)?
 - Default depth per size?
