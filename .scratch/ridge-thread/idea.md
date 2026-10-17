@@ -45,11 +45,18 @@ Ridge"). Dimension research: [research.md](research.md).
   vertically), so the layers run roughly parallel to the thread.
 - Still to record: printer, test method, numbers. Horizontal bores not tested yet.
 
+2026-10-18, user's second test round, PETG, same two variants (inner Ø −0.2 mm vs. default):
+
+- M3: inner Ø −0.2 (2.40) is fine.
+- M4 / M5: inner Ø −0.2 (3.30 / 4.30) is too small. Too much friction when the screw goes in.
+- So the −0.2 step does not scale to M4 / M5 (at least in PETG). These sizes need a value
+  between default and −0.2, or the default. Not yet tested.
+
 ## Open questions
 
 - Size rule: inner diameter at the ridges ≈ pitch diameter D2 (what the fork's table does), or
   test-based values per size? See research.md, Q3. Only M3 has a public source (Thomas's model).
-  First tests point to a smaller inner Ø (see Test results).
+  First tests point to a smaller inner Ø for M3 only; M4 / M5 too tight at −0.2 in PETG (see Test results).
 - Ridge count: always 3 (Thomas; easy "one ridge down" print orientation) or more above M4?
 - Lead-in: chamfer on the ridge top edges (fork, 78°) or a swept taper (Thomas, 0.3 × 1.5)?
 - Default depth per size?
