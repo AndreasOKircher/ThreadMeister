@@ -16,11 +16,15 @@ Status: ready-for-agent
 2. **Docs:** `Readme.md` and `resources/help.html`: Ridge Thread section (what it is, sizes,
    `[Ridge Threads]` config, print tip "orient one ridge straight down", recommended up to M5).
    `docs/changelog.md` entry.
-3. **Credits** in `Readme.md`: concept by Thomas Sanladerer (link to his article); first Fusion
-   implementation and the icons by Connor McComb (ThreadMeisterExtended, MIT,
-   © 2026 Connor McComb). Keep his copyright notice for the copied icons.
+3. **Credits** (required by the MIT license for the copied icons and chamfer code; user wants
+   them visible):
+   - `Readme.md` credits section: concept by Thomas Sanladerer (link to his article, courtesy
+     credit); first Fusion implementation by Connor McComb (ThreadMeisterExtended, link).
+   - `Readme.md` and `License.txt`: "Icons and Ridge Thread chamfer code adapted from
+     ThreadMeisterExtended, © 2026 Connor McComb, MIT license."
 
-Own icon design: separate later issue, not this one.
+Own icon design: separate later issue, not this one. The icons are temporary. When they are
+replaced, drop "Icons and" from the credit line; the chamfer-code credit stays.
 
 ## Acceptance criteria
 
