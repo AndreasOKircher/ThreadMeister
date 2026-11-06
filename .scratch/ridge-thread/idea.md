@@ -43,7 +43,7 @@ Ridge"). Dimension research: [research.md](research.md).
   Smith's M3 crush ribs (ridges down to Ø2.4, research.md Q2).
 - Setup: ASA, 3 perimeters, 0.2 mm layer height. Layers at 90° to the bore axis (bore printed
   vertically), so the layers run roughly parallel to the thread.
-- Still to record: printer, test method, numbers. Horizontal bores not tested yet.
+- Still to record: test method, numbers. Horizontal bores not tested yet.
 
 2026-10-18, user's second test round, PETG, same two variants (inner Ø −0.2 mm vs. default):
 
@@ -52,15 +52,24 @@ Ridge"). Dimension research: [research.md](research.md).
 - So the −0.2 step does not scale to M4 / M5 (at least in PETG). These sizes need a value
   between default and −0.2, or the default. Not yet tested.
 
+### Decision (2026-11-07, user reviewed both rounds)
+
+| Size | Inner Ø at ridges | Source |
+|---|---|---|
+| M3 | 2.40 | default −0.2 (ridge Ø +0.2, arc distance unchanged) |
+| M4 | 3.50 | fork default, no change |
+| M5 | 4.50 | fork default, no change |
+
+Printer: Prusa Core One. Filaments: Prusament ASA and Prusament PETG. Layer height assumed 0.2 mm.
+
 ## Open questions
 
-- Size rule: inner diameter at the ridges ≈ pitch diameter D2 (what the fork's table does), or
-  test-based values per size? See research.md, Q3. Only M3 has a public source (Thomas's model).
-  First tests point to a smaller inner Ø for M3 only; M4 / M5 too tight at −0.2 in PETG (see Test results).
+- ~~Size rule~~ Decided 2026-11-07 from tests: M3 inner Ø 2.40 (default −0.2); M4 3.50 and
+  M5 4.50 (fork defaults, unchanged).
 - Ridge count: always 3 (Thomas; easy "one ridge down" print orientation) or more above M4?
 - Lead-in: chamfer on the ridge top edges (fork, 78°) or a swept taper (Thomas, 0.3 × 1.5)?
 - Default depth per size?
-- Which sizes to ship: Thomas only recommends this up to M5.
+- ~~Which sizes to ship~~ Decided 2026-11-07: M3, M4, M5 only. Other sizes are not needed.
 - Credit: README note for Thomas Sanladerer and Connor McComb; ask Connor where the non-M3
   numbers come from (questions at the end of research.md).
 
