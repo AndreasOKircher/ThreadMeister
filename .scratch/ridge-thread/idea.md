@@ -66,14 +66,15 @@ Printer: Prusa Core One. Filaments: Prusament ASA and Prusament PETG. Layer heig
 
 - **Lead-in:** same as ThreadMeisterExtended: distance-and-angle chamfer on the top edge of each
   ridge arc, 78°, fork's per-size chamfer distance.
-  Open check: M3 protrusion is now 0.40 (was 0.30), but the fork chamfer is 0.28. Keep 0.28, or
-  follow the fork rule "chamfer ≈ protrusion − a little" (≈ 0.38)?
+  M3 keeps the fork chamfer 0.28 although its protrusion is now 0.40 (user decision: the tested
+  parts used 0.28 and were good).
 - **Depth:** default 4 × D (M3 = 12, M4 = 16, M5 = 20). Depth is the only Ridge Thread value the
   user can edit in the dialog.
 - **config.ini:** each Ridge Thread size gets one parameter, the inner diameter at the ridges,
   plus a comment line that says what this diameter is.
-- **Name:** user asked "grip ridge" vs "ridge thread" — see answer in session; add the chosen term
-  to `CONTEXT.md`.
+- **Name:** **Ridge Thread** (not "Grip Ridge"). Add it to `CONTEXT.md`.
+- **Dialog:** open — Bore Type dropdown (like the fork) vs. Ridge Thread sizes in the Insert Size
+  list.
 
 ## Open questions
 
