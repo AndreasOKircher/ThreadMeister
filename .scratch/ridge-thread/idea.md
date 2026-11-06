@@ -73,8 +73,11 @@ Printer: Prusa Core One. Filaments: Prusament ASA and Prusament PETG. Layer heig
 - **config.ini:** each Ridge Thread size gets one parameter, the inner diameter at the ridges,
   plus a comment line that says what this diameter is.
 - **Name:** **Ridge Thread** (not "Grip Ridge"). Add it to `CONTEXT.md`.
-- **Dialog:** open — Bore Type dropdown (like the fork) vs. Ridge Thread sizes in the Insert Size
-  list.
+- **Dialog:** same as ThreadMeisterExtended: a "Bore Type" dropdown above "Insert Size"
+  (Heat-Set Insert / Ridge Thread). Ridge Thread → size list M3/M4/M5, Depth field shown,
+  Chamfer and Bottom Radius hidden.
+- **Icon:** for now, reuse the fork's Ridge Thread icon (check the fork's license and credit it).
+  Own icon: later, separate issue.
 
 ## Open questions
 
