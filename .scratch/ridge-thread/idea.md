@@ -54,11 +54,11 @@ Ridge"). Dimension research: [research.md](research.md).
 
 ### Decision (2026-11-07, user reviewed both rounds)
 
-| Size | Inner Ø at ridges | Source |
-|---|---|---|
-| M3 | 2.40 | default −0.2 (ridge Ø +0.2, arc distance unchanged) |
-| M4 | 3.50 | fork default, no change |
-| M5 | 4.50 | fork default, no change |
+| Size | Inner Ø at ridges | Ridges | Source |
+|---|---|---|---|
+| M3 | 2.40 | 3 | default −0.2 (ridge Ø +0.2, arc distance unchanged) |
+| M4 | 3.50 | 3 | fork default, no change |
+| M5 | 4.50 | 4 | fork default, no change |
 
 Printer: Prusa Core One. Filaments: Prusament ASA and Prusament PETG. Layer height assumed 0.2 mm.
 
@@ -66,7 +66,7 @@ Printer: Prusa Core One. Filaments: Prusament ASA and Prusament PETG. Layer heig
 
 - ~~Size rule~~ Decided 2026-11-07 from tests: M3 inner Ø 2.40 (default −0.2); M4 3.50 and
   M5 4.50 (fork defaults, unchanged).
-- Ridge count: always 3 (Thomas; easy "one ridge down" print orientation) or more above M4?
+- ~~Ridge count~~ Decided 2026-11-07: M3 / M4 = 3, M5 = 4 (same as the fork defaults that were tested).
 - Lead-in: chamfer on the ridge top edges (fork, 78°) or a swept taper (Thomas, 0.3 × 1.5)?
 - Default depth per size?
 - ~~Which sizes to ship~~ Decided 2026-11-07: M3, M4, M5 only. Other sizes are not needed.
