@@ -1,6 +1,6 @@
 # Bore Type icons, user docs and credits
 
-Status: ready-for-agent
+Status: on-branch
 
 ## Parent
 

@@ -1,6 +1,6 @@
 # Ridge Thread Bore: Bore Type dropdown, config and constrained cut
 
-Status: ready-for-agent
+Status: on-branch
 
 ## Parent
 

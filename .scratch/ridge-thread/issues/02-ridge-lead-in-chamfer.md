@@ -1,6 +1,6 @@
 # Ridge Thread lead-in chamfer
 
-Status: ready-for-agent
+Status: on-branch
 
 ## Parent
 
