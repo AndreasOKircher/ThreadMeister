@@ -27,6 +27,10 @@ INSERT_SPECS = {
     '1/4"-20 x 12.7mm (camera)': (8.0, 12.7, 3.0)
 }
 
+# Ridge Thread inner diameter at the Ridges: size -> inner_dia_mm
+# Populated by tm_config.load_config() from [Ridge Threads]; defaults set here as fallback.
+RIDGE_THREAD_SPECS = {'M3': 2.40, 'M4': 3.50, 'M5': 4.50}
+
 # Runtime configuration (overwritten by tm_config.load_config())
 CONFIG = {
     'chamfer_size': 0.5,

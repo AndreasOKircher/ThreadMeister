@@ -651,3 +651,92 @@ def addBottomRadiusToBlindHole(component, extrudeFeature, targetBody, sketch, ci
         if tm_state._ui:
             tm_state._ui.messageBox('Error in addBottomRadiusToBlindHole:\n{}'.format(traceback.format_exc()))
         return None
+
+
+def createRidgeThreadSketch(sketch, projectedPoint, geometry):
+    """
+    Draw a Ridge Thread in the Temp Sketch, fully constrained to the projected Sketch Point.
+
+    Bore circle centred on the point, plus N Ridge circles whose centres sit at the end of
+    construction lines from the point (length = arc distance, 360/N apart, first line
+    horizontal). Every curve hangs off the projected point, so moving the Sketch Point in the
+    Parent Sketch moves the whole Ridge Thread. No trim: the central profile is picked by
+    area (findRidgeThreadProfile).
+
+    Args:
+        sketch: The Temp Sketch.
+        projectedPoint: The Sketch Point projected into the Temp Sketch.
+        geometry: tm_ridge.RidgeGeometry (mm).
+
+    Returns:
+        The central Bore profile, or None if it was not found.
+    """
+    center = projectedPoint.geometry
+    circles = sketch.sketchCurves.sketchCircles
+    lines = sketch.sketchCurves.sketchLines
+    constraints = sketch.geometricConstraints
+    dims = sketch.sketchDimensions
+
+    boreRadius = geometry.bore_dia / 2.0 / 10.0      # mm -> cm
+    ridgeRadius = geometry.ridge_dia / 2.0 / 10.0
+    arcDistance = geometry.arc_distance / 10.0
+
+    def _pt(x, y):
+        return adsk.core.Point3D.create(center.x + x, center.y + y, 0.0)
+
+    bore = circles.addByCenterRadius(center, boreRadius)
+    constraints.addCoincident(bore.centerSketchPoint, projectedPoint)
+    dims.addDiameterDimension(bore, _pt(-boreRadius * 1.5, boreRadius * 1.5))
+
+    previousLine = None
+    for i in range(geometry.count):
+        angle = 2.0 * math.pi * i / geometry.count
+        end = _pt(arcDistance * math.cos(angle), arcDistance * math.sin(angle))
+        line = lines.addByTwoPoints(projectedPoint, end)
+        line.isConstruction = True
+        mid = _pt(0.5 * arcDistance * math.cos(angle) + 0.05, 0.5 * arcDistance * math.sin(angle) + 0.05)
+        dims.addDistanceDimension(
+            line.startSketchPoint, line.endSketchPoint,
+            adsk.fusion.DimensionOrientations.AlignedDimensionOrientation, mid)
+        if previousLine is None:
+            constraints.addHorizontal(line)
+        else:
+            half = angle - math.pi / geometry.count
+            dims.addAngularDimension(
+                previousLine, line,
+                _pt(0.7 * arcDistance * math.cos(half), 0.7 * arcDistance * math.sin(half)))
+        previousLine = line
+
+        ridge = circles.addByCenterRadius(line.endSketchPoint, ridgeRadius)
+        dims.addDiameterDimension(
+            ridge, _pt((arcDistance + ridgeRadius * 1.5) * math.cos(angle),
+                       (arcDistance + ridgeRadius * 1.5) * math.sin(angle)))
+
+    return findRidgeThreadProfile(sketch, center, geometry)
+
+
+def findRidgeThreadProfile(sketch, center, geometry):
+    """
+    Pick the central Bore profile of a Ridge Thread: the profile whose centroid is at the
+    Sketch Point and whose area matches the bore circle minus the Ridge lobes.
+
+    Returns:
+        The profile, or None.
+    """
+    from .tm_ridge import central_profile_area_mm2
+    expected = central_profile_area_mm2(geometry) / 100.0   # mm2 -> cm2
+    best = None
+    bestDiff = None
+    # Loose centroid gate (same space as _filter_by_centroid); the area match decides.
+    # The small lobe profiles have their centroids out near the Ridges, far from the axis.
+    centroidTol = geometry.bore_dia / 2.0 / 10.0 * 0.25
+    for prof in sketch.profiles:
+        props = prof.areaProperties(adsk.fusion.CalculationAccuracy.MediumCalculationAccuracy)
+        if center.distanceTo(props.centroid) > centroidTol:
+            continue
+        diff = abs(props.area - expected)
+        if bestDiff is None or diff < bestDiff:
+            best, bestDiff = prof, diff
+    if best is None or bestDiff > expected * 0.02:
+        return None
+    return best

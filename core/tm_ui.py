@@ -7,6 +7,7 @@ the updateInfoText helper that refreshes the info text box.
 import adsk.core, adsk.fusion, traceback
 from . import tm_state
 from . import tm_config
+from . import tm_ridge
 from .tm_helpers import calc_blind_hole_depth_mm
 from .tm_execute import CommandExecuteHandler
 
@@ -45,27 +46,28 @@ class CommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
             pointSelect.addSelectionFilter('SketchPoints')
             pointSelect.setSelectionLimits(1, 0)
 
-            # Insert size dropdown
+            # Bore Type dropdown (Heat-Set Insert / Ridge Thread)
+            isRidge = tm_state.CONFIG.get('last_bore_type') == tm_ridge.BORE_TYPE_RIDGE
+            boreTypeDropdown = inputs.addDropDownCommandInput('boreType', 'Bore Type',
+                                                             adsk.core.DropDownStyles.TextListDropDownStyle)
+            boreTypeDropdown.listItems.add(tm_ridge.BORE_TYPE_INSERT, not isRidge)
+            boreTypeDropdown.listItems.add(tm_ridge.BORE_TYPE_RIDGE, isRidge)
+
+            # Insert size dropdown (Insert Specs, or Ridge Thread sizes)
             insertDropdown = inputs.addDropDownCommandInput('insertSize', 'Insert Size',
                                                            adsk.core.DropDownStyles.TextListDropDownStyle)
-            insertList = insertDropdown.listItems
-
-            lastSelected = tm_state.CONFIG.get('last_selected_insert', 'M3 x 5.7mm (standard)')
-            foundLastSelected = False
-            for name in tm_state.INSERT_SPECS.keys():
-                isSelected = (name == lastSelected)
-                if isSelected:
-                    foundLastSelected = True
-                insertList.add(name, isSelected)
-
-            if not foundLastSelected and insertList.count > 0:
-                insertList.item(0).isSelected = True
+            fillSizeDropdown(insertDropdown, isRidge)
 
             # Hole type
             holeTypeGroup = inputs.addRadioButtonGroupCommandInput('holeType', 'Hole Type')
             saved_is_blind = tm_state.CONFIG.get('hole_type_blind', True)
             holeTypeGroup.listItems.add('Blind Hole', saved_is_blind)
             holeTypeGroup.listItems.add('Through Hole', not saved_is_blind)
+
+            # Ridge Thread depth (blind only); value in cm, shown in mm
+            inputs.addValueInput('ridgeDepth', 'Depth', 'mm',
+                                 adsk.core.ValueInput.createByReal(0.0))
+            resetRidgeDepth(inputs)
 
             # Chamfer option
             inputs.addBoolValueInput('addChamfer',
@@ -94,6 +96,7 @@ class CommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
 
             # Info text
             inputs.addTextBoxCommandInput('infoText', '', '', 4, True)
+            applyBoreTypeVisibility(inputs)
             updateInfoText(inputs)
 
         except Exception:
@@ -114,7 +117,14 @@ class InputChangedHandler(adsk.core.InputChangedEventHandler):
                     pointSelect.isEnabled = True
                     pointSelect.hasFocus = True
 
-            if changedInput.id in ('insertSize', 'holeType', 'addChamfer'):
+            if changedInput.id == 'boreType':
+                fillSizeDropdown(inputs.itemById('insertSize'), isRidgeSelected(inputs))
+            if changedInput.id in ('boreType', 'insertSize'):
+                resetRidgeDepth(inputs)
+            if changedInput.id in ('boreType', 'holeType'):
+                applyBoreTypeVisibility(inputs)
+
+            if changedInput.id in ('boreType', 'insertSize', 'holeType', 'addChamfer', 'ridgeDepth'):
                 updateInfoText(inputs)
 
         except Exception:
@@ -130,11 +140,70 @@ class ValidateInputsHandler(adsk.core.ValidateInputsEventHandler):
 
             if bodySelect.selectionCount == 0 or pointSelect.selectionCount == 0:
                 args.areInputsValid = False
+            elif isRidgeSelected(inputs) and inputs.itemById('ridgeDepth').value <= 0:
+                args.areInputsValid = False
             else:
                 args.areInputsValid = True
 
         except Exception:
             tm_state._ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
+
+
+def isRidgeSelected(inputs):
+    """True when the Bore Type dropdown is on Ridge Thread."""
+    boreType = inputs.itemById('boreType')
+    return boreType.selectedItem.name == tm_ridge.BORE_TYPE_RIDGE
+
+
+def fillSizeDropdown(dropdown, isRidge):
+    """Fill the size dropdown with Insert Specs or Ridge Thread sizes; reselect the last one."""
+    listItems = dropdown.listItems
+    listItems.clear()
+    if isRidge:
+        names = list(tm_state.RIDGE_THREAD_SPECS.keys())
+        lastSelected = tm_state.CONFIG.get('last_ridge_thread', 'M3')
+    else:
+        names = list(tm_state.INSERT_SPECS.keys())
+        lastSelected = tm_state.CONFIG.get('last_selected_insert', 'M3 x 5.7mm (standard)')
+    found = False
+    for name in names:
+        isSelected = (name == lastSelected)
+        found = found or isSelected
+        listItems.add(name, isSelected)
+    if not found and listItems.count > 0:
+        listItems.item(0).isSelected = True
+
+
+def resetRidgeDepth(inputs):
+    """Set the Ridge Thread depth to the size's default (4 x D). Not remembered."""
+    if not isRidgeSelected(inputs):
+        return
+    size = inputs.itemById('insertSize').selectedItem.name
+    g = tm_ridge.ridge_geometry(size, tm_state.RIDGE_THREAD_SPECS[size])
+    inputs.itemById('ridgeDepth').value = g.default_depth / 10.0   # mm -> cm
+
+
+def applyBoreTypeVisibility(inputs):
+    """Ridge Thread: show Depth (blind only), hide Chamfer and Bottom Radius."""
+    isRidge = isRidgeSelected(inputs)
+    isBlind = inputs.itemById('holeType').selectedItem.name == 'Blind Hole'
+    inputs.itemById('ridgeDepth').isVisible = isRidge and isBlind
+    inputs.itemById('addChamfer').isVisible = not isRidge
+    inputs.itemById('addBottomRadius').isVisible = not isRidge
+
+
+def _ridgeInfoText(inputs, isBlindHole):
+    size = inputs.itemById('insertSize').selectedItem.name
+    inner = tm_state.RIDGE_THREAD_SPECS[size]
+    g = tm_ridge.ridge_geometry(size, inner)
+    if isBlindHole:
+        depthStr = f'{inputs.itemById("ridgeDepth").value * 10.0:.1f} mm'
+    else:
+        depthStr = 'Through body'
+    return (f'<b>Ridge Thread {size}:</b><br/>' +
+            f'Bore diameter: {g.bore_dia} mm<br/>' +
+            f'Inner diameter at ridges: {inner} mm ({g.count} ridges)<br/>' +
+            f'Hole depth: {depthStr}')
 
 
 def updateInfoText(inputs):
@@ -146,6 +215,10 @@ def updateInfoText(inputs):
 
         insertName = insertSize.selectedItem.name
         isBlindHole = holeType.selectedItem.name == 'Blind Hole'
+
+        if isRidgeSelected(inputs):
+            infoText.formattedText = _ridgeInfoText(inputs, isBlindHole)
+            return
 
         holeDia, insertLen, minWall = tm_state.INSERT_SPECS[insertName]
 

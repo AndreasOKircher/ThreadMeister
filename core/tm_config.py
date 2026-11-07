@@ -12,6 +12,7 @@ Config sections:
 import os
 import configparser
 from . import tm_state
+from . import tm_ridge
 
 
 def _get_config_path():
@@ -24,7 +25,9 @@ def _read_config_file(config_file=None):
     """Read and return a RawConfigParser from config.ini."""
     if config_file is None:
         config_file = _get_config_path()
-    config = configparser.RawConfigParser()
+    # '#' lines are kept as value-less options so the save_* functions write them back
+    # (e.g. the [Ridge Threads] explanation). Readers skip options starting with '#'.
+    config = configparser.RawConfigParser(comment_prefixes=(';',), allow_no_value=True)
     config.optionxform = str  # Preserve case
     config.read(config_file, encoding='utf-8')
     return config
@@ -95,6 +98,10 @@ def load_config():
             config, 'hole_type_blind', 'UI State', True, 'boolean')
         tm_state.CONFIG['last_selected_insert'] = _get(
             config, 'last_selected_insert', 'UI State', 'M3 x 5.7mm (standard)')
+        tm_state.CONFIG['last_bore_type'] = _get(
+            config, 'last_bore_type', 'UI State', 'Heat-Set Insert')
+        tm_state.CONFIG['last_ridge_thread'] = _get(
+            config, 'last_ridge_thread', 'UI State', 'M3')
 
         # --- [Developer]: Debug flags ---
         tm_state.CONFIG['enable_logging'] = _get(
@@ -137,6 +144,24 @@ def load_config():
                     warnings.append(f'Insert "{name}": Error reading values. Skipped.')
                     continue
 
+        # --- [Ridge Threads] ---
+        tm_state.RIDGE_THREAD_SPECS.clear()
+        tm_state.RIDGE_THREAD_SPECS.update(tm_ridge.DEFAULT_INNER_DIA)
+        if config.has_section('Ridge Threads'):
+            for size, default in tm_ridge.DEFAULT_INNER_DIA.items():
+                if not config.has_option('Ridge Threads', size):
+                    continue
+                bore_dia = tm_ridge.ridge_geometry(size, default).bore_dia
+                try:
+                    inner = config.getfloat('Ridge Threads', size)
+                except ValueError:
+                    warnings.append(f'Ridge Thread "{size}": Invalid number format. Using default {default}mm.')
+                    continue
+                if inner <= 0 or inner >= bore_dia:
+                    warnings.append(f'Ridge Thread "{size}": inner diameter {inner}mm must be between 0 and {bore_dia}mm. Using default {default}mm.')
+                    continue
+                tm_state.RIDGE_THREAD_SPECS[size] = inner
+
         if not tm_state.INSERT_SPECS:
             errors.append('No valid inserts found in config.ini!')
             tm_state.INSERT_SPECS.update(get_default_inserts())
@@ -145,6 +170,8 @@ def load_config():
         # Auto-migrate old format to new sections
         if needs_migration:
             _migrate_config(config_file)
+        elif not config.has_section('Ridge Threads'):
+            _append_ridge_thread_section(config_file)
 
         if errors or warnings:
             msg = ''
@@ -169,6 +196,30 @@ def _migrate_config(config_file):
         _write_config_file(config_file)
     except Exception:
         pass  # Migration failure is non-critical; old format still works
+
+
+def _ridge_thread_section_text():
+    """Return the [Ridge Threads] section text (with its comment) for the current specs."""
+    lines = ['[Ridge Threads]',
+             '# Inner diameter at the ridges in mm (the screw forms its thread in the ridges)']
+    for size, inner in tm_state.RIDGE_THREAD_SPECS.items():
+        lines.append(f'{size} = {inner}')
+    return '\n'.join(lines) + '\n'
+
+
+def _append_ridge_thread_section(config_file):
+    """Add a missing [Ridge Threads] section to an existing config.ini, keeping the rest."""
+    try:
+        with open(config_file, 'r', encoding='utf-8') as f:
+            text = f.read()
+        if text and not text.endswith('\n'):
+            text += '\n'
+        if text and not text.endswith('\n\n'):
+            text += '\n'
+        with open(config_file, 'w', encoding='utf-8') as f:
+            f.write(text + _ridge_thread_section_text())
+    except Exception:
+        pass  # Non-critical; built-in defaults are used
 
 
 def _write_config_file(config_file=None):
@@ -205,6 +256,7 @@ def _write_config_file(config_file=None):
 
     with open(config_file, 'w', encoding='utf-8') as f:
         config.write(f)
+        f.write(_ridge_thread_section_text())
 
 
 def save_last_selected_insert(insert_name):
@@ -216,6 +268,21 @@ def save_last_selected_insert(insert_name):
         if not config.has_section(section):
             config.add_section(section)
         config.set(section, 'last_selected_insert', insert_name)
+        with open(config_file, 'w', encoding='utf-8') as f:
+            config.write(f)
+    except Exception:
+        pass
+
+
+def save_bore_type_state(bore_type, ridge_thread_size):
+    """Persist the last Bore Type and last Ridge Thread size to config.ini."""
+    try:
+        config_file = _get_config_path()
+        config = _read_config_file(config_file)
+        if not config.has_section('UI State'):
+            config.add_section('UI State')
+        config.set('UI State', 'last_bore_type', bore_type)
+        config.set('UI State', 'last_ridge_thread', ridge_thread_size)
         with open(config_file, 'w', encoding='utf-8') as f:
             config.write(f)
     except Exception:
@@ -272,6 +339,11 @@ def create_default_config():
             f.write('[Inserts]\n')
             for name, (dia, length, wall) in get_default_inserts().items():
                 f.write(f'{name} = {dia}, {length}, {wall}\n')
+            f.write('\n')
+            f.write('[Ridge Threads]\n')
+            f.write('# Inner diameter at the ridges in mm (the screw forms its thread in the ridges)\n')
+            for size, inner in tm_ridge.DEFAULT_INNER_DIA.items():
+                f.write(f'{size} = {inner}\n')
             f.write('\n')
             f.write('[UI State]\n')
             f.write('chamfer_enabled_default = True\n')

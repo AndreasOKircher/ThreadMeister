@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — Ridge Thread
+- **New Bore Type: Ridge Thread** (M3, M4, M5). A bore a little larger than the screw with 3 or 4 Ridges inside; the screw forms its own thread in the Ridges, so no Insert is needed. Pick it in the new "Bore Type" dropdown. Blind or through; blind depth defaults to 4 × screw diameter and can be changed in the dialog.
+- The Ridge Thread follows its Sketch Point when the point is moved later.
+- `config.ini` gets a `[Ridge Threads]` section (inner diameter at the Ridges per size). Existing configs get it added automatically.
+- Comment lines (`# ...`) in `config.ini` are now kept when the add-in saves the dialog state.
+
 ## 1.2.5 — 2026-10-07 — Auto-load after installation
 - **Fixed** (App Store review): the add-in did not start automatically after installation — `runOnStartup` was `false` in both manifests, so a fresh install required manually starting it in Scripts and Add-Ins. Now `true` in `ThreadMeister.manifest` and `manifest.json`.
 

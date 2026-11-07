@@ -1,6 +1,6 @@
 # Ridge Thread Bore: Bore Type dropdown, config and constrained cut
 
-Status: on-branch
+Status: ready-for-human
 
 ## Parent
 
@@ -62,4 +62,21 @@ None — can start immediately.
 
 ## Implementation Summary
 
-<Filled at issue close.>
+**Code done:** 2026-11-07, on `ridge-thread-r1` (TDD). Manual Fusion smoke still open.
+
+- New `core/tm_ridge.py`: built-in size table (M3 / M4 / M5), `ridge_geometry()` (Ridge Ø =
+  2 × arc distance − inner Ø, default depth 4 × D), `central_profile_area_mm2()`.
+- `config.ini` `[Ridge Threads]` with comment line; loaded into `tm_state.RIDGE_THREAD_SPECS`,
+  bad values → default + warning, missing section appended to the user's file. `[UI State]`
+  remembers `last_bore_type` and `last_ridge_thread`. `_read_config_file` now keeps `#` lines,
+  so the save_* functions no longer delete comments.
+- Dialog: Bore Type dropdown, size list switches, Depth field (blind only, reset to 4 × D on
+  size change), Chamfer / Bottom Radius hidden for Ridge Thread.
+- Execute: `createRidgeThreadSketch()` draws bore + Ridge circles, all constrained to the
+  projected point (construction lines with length + angle dimensions, first line horizontal,
+  diameter dimensions); no trim; central profile picked by area. Timeline Group
+  `(Nx M3 Ridge Thread)`.
+- `CONTEXT.md` (Bore Type, Ridge Thread, Ridge), `docs/development-notes.md`, changelog.
+- Tests: 13 in `tests/test_ridge.py`, 12 in `tests/test_config.py::TestRidgeThreadConfig`.
+  All 137 tests pass.
+- Manual Fusion smoke: **not done yet** (acceptance criteria above).

@@ -70,6 +70,25 @@ _Avoid_: open hole
 Which side of the Sketch Plane the Bore goes into — the side where the Target Body is.
 Computed by `findExtrudeDirectionFromSketch()`.
 
+**Bore Type**:
+What a Bore is for, chosen in the dialog's Bore Type dropdown: **Heat-Set Insert** (an
+Insert Bore, sized from an Insert Spec) or **Ridge Thread**.
+_Avoid_: insert type, hole kind
+
+**Ridge Thread**:
+A Bore for a screw without an Insert: a bore a little larger than the screw, with N Ridges
+that stick into it. The screw forms its own thread in the Ridges. Sizes M3, M4, M5;
+geometry in `core/tm_ridge.py`, inner diameter in `config.ini` `[Ridge Threads]`.
+Concept by Thomas Sanladerer ("self-forming thread"); called "Grip Ridge" in
+ThreadMeisterExtended.
+_Avoid_: grip ridge, tapless hole, self-tapping hole
+
+**Ridge**:
+One arc-shaped rib inside a Ridge Thread, made by a Ridge circle (centred at the arc
+distance from the Bore axis) that overlaps the bore circle. **Inner diameter** = the
+diameter of the circle that touches all Ridge tips.
+_Avoid_: rib, lobe, knob
+
 **Chamfer**:
 Optional bevel on the Bore's entry edge (`chamfer_size`), to guide the Insert in.
 _Avoid_: countersink
