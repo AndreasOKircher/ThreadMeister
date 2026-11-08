@@ -51,6 +51,7 @@ powershell -NoProfile -Command ^
   "Copy-Item (Join-Path $root 'core\tm_helpers.py') (Join-Path $pkg 'core');" ^
   "Copy-Item (Join-Path $root 'core\tm_geometry.py') (Join-Path $pkg 'core');" ^
   "Copy-Item (Join-Path $root 'core\tm_execute.py') (Join-Path $pkg 'core');" ^
+  "Copy-Item (Join-Path $root 'core\tm_ridge.py') (Join-Path $pkg 'core');" ^
   "Copy-Item (Join-Path $root 'core\tm_ui.py') (Join-Path $pkg 'core');" ^
   "Copy-Item (Join-Path $root 'core\tm_debug_export.py') (Join-Path $pkg 'core');" ^
   "Copy-Item (Join-Path $root 'resources\icons\*') (Join-Path $pkg 'resources\icons');" ^

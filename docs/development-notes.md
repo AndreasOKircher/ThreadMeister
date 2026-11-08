@@ -70,7 +70,8 @@ The config file is organized into four sections:
 |---------|---------|-------------|
 | `[Settings]` | Design parameters (chamfer_size, blind_hole_extra_depth, bottom_radius_size) | User-edited |
 | `[Inserts]` | Insert specifications (name = diameter, length, min_wall) | User-edited |
-| `[UI State]` | Remembered menu state (checkbox states, last insert, hole type) | Auto-saved by add-in |
+| `[Ridge Threads]` | Inner diameter at the Ridges per Ridge Thread size (`M3 = 2.4`); other Ridge Thread geometry is built into `core/tm_ridge.py`. Added automatically if missing. | User-edited |
+| `[UI State]` | Remembered menu state (checkbox states, last insert, hole type, last Bore Type, last Ridge Thread size) | Auto-saved by add-in |
 | `[Developer]` | Debug flags (enable_logging, enable_debug_export) | User-edited |
 
 **Backward compatibility:** `tm_config.py` auto-migrates old single-section configs. If `[UI State]` is missing, all keys are read from `[Settings]` as fallback. On next save, the file is rewritten in the new format.

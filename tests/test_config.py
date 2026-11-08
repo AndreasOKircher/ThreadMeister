@@ -10,7 +10,8 @@ from core.tm_config import (
     load_config,
     save_last_selected_insert,
     save_checkbox_states,
-    create_default_config
+    create_default_config,
+    save_bore_type_state
 )
 from core import tm_state
 
@@ -224,3 +225,85 @@ class TestCreateDefaultConfig:
         assert parser.has_section('Inserts')
         assert parser.get('Settings', 'chamfer_size') == '0.5'
         assert len(parser.items('Inserts')) == 13
+
+
+def _write_ini(path, text):
+    path.write_text(text, encoding='utf-8')
+    return path
+
+
+_BASE_INI = (
+    '[Settings]\nchamfer_size = 0.5\n\n'
+    '[Inserts]\nM3 x 5.7mm (standard) = 4.4, 5.7, 1.6\n\n'
+    '[UI State]\nhole_type_blind = True\n\n'
+)
+
+
+class TestRidgeThreadConfig:
+    """[Ridge Threads] section: inner diameter at the Ridges per size, in mm."""
+
+    @pytest.fixture
+    def ini(self, tmp_path, monkeypatch):
+        path = tmp_path / 'config.ini'
+        monkeypatch.setattr('core.tm_config._get_config_path', lambda: str(path))
+        return path
+
+    def test_reads_inner_dia_per_size(self, ini):
+        _write_ini(ini, _BASE_INI + '[Ridge Threads]\nM3 = 2.3\nM4 = 3.4\nM5 = 4.4\n')
+        load_config()
+        assert tm_state.RIDGE_THREAD_SPECS == {'M3': 2.3, 'M4': 3.4, 'M5': 4.4}
+
+    @pytest.mark.parametrize('value', ['abc', '0', '-1', '3.2', '5'])
+    def test_invalid_value_uses_default(self, ini, value):
+        """Not a number, not positive, or not smaller than the M3 bore (3.2) -> default 2.40."""
+        _write_ini(ini, _BASE_INI + f'[Ridge Threads]\nM3 = {value}\nM4 = 3.4\n')
+        load_config()
+        assert tm_state.RIDGE_THREAD_SPECS['M3'] == 2.40
+        assert tm_state.RIDGE_THREAD_SPECS['M4'] == 3.4
+
+    def test_missing_section_uses_defaults_and_is_added_to_file(self, ini):
+        _write_ini(ini, _BASE_INI)
+        load_config()
+        assert tm_state.RIDGE_THREAD_SPECS == {'M3': 2.40, 'M4': 3.50, 'M5': 4.50}
+        text = ini.read_text(encoding='utf-8')
+        assert '[Ridge Threads]' in text
+        assert '# Inner diameter at the ridges' in text
+        assert 'M3 = 2.4' in text
+        assert 'M3 x 5.7mm (standard) = 4.4, 5.7, 1.6' in text  # rest of the file kept
+
+    def test_existing_section_is_not_rewritten(self, ini):
+        original = _BASE_INI + '[Ridge Threads]\n# my note\nM3 = 2.3\n'
+        _write_ini(ini, original)
+        load_config()
+        assert ini.read_text(encoding='utf-8') == original
+
+    def test_default_config_has_section(self, ini):
+        create_default_config()
+        load_config()
+        text = ini.read_text(encoding='utf-8')
+        assert text.count('[Ridge Threads]') == 1
+        assert tm_state.RIDGE_THREAD_SPECS == {'M3': 2.40, 'M4': 3.50, 'M5': 4.50}
+
+    def test_bore_type_state_defaults(self, ini):
+        _write_ini(ini, _BASE_INI)
+        load_config()
+        assert tm_state.CONFIG['last_bore_type'] == 'Heat-Set Insert'
+        assert tm_state.CONFIG['last_ridge_thread'] == 'M3'
+
+    def test_bore_type_state_round_trip(self, ini):
+        _write_ini(ini, _BASE_INI)
+        save_bore_type_state('Ridge Thread', 'M5')
+        load_config()
+        assert tm_state.CONFIG['last_bore_type'] == 'Ridge Thread'
+        assert tm_state.CONFIG['last_ridge_thread'] == 'M5'
+
+    def test_comment_survives_ui_state_save(self, ini):
+        create_default_config()
+        save_last_selected_insert('M4 x 8.1mm (standard)')
+        save_checkbox_states(True, False, True, True)
+        save_bore_type_state('Ridge Thread', 'M4')
+        load_config()
+        text = ini.read_text(encoding='utf-8')
+        assert '# Inner diameter at the ridges' in text
+        assert tm_state.RIDGE_THREAD_SPECS == {'M3': 2.40, 'M4': 3.50, 'M5': 4.50}
+        assert 'M4 x 8.1mm (standard)' in tm_state.INSERT_SPECS

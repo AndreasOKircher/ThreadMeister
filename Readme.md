@@ -8,17 +8,18 @@
 </p>
 
 
-<h1 align="center">ThreadMeister – Heat-Set Insert Add-in for Fusion 360</h1>
+<h1 align="center">ThreadMeister – Heat-Set Insert &amp; Ridge Thread Add-in for Fusion 360</h1>
 
 <div align="center">
-  <img src="resources/images/Title.png" alt="ThreadMeister Logo" width="600">
+  <img src="resources/images/Title_RidgeThread_v6.png" alt="ThreadMeister: Ridge Thread and Heat-Set Insert" width="600">
 </div>
 
-<p align="center" style="max-width:600px; margin: 0 auto;">An add-in for Autodesk Fusion 360 that automates the creation of heat-set insert holes for 3D printing, using insert dimension recommendations from <a href="https://cnckitchen.com">CNC Kitchen</a>.</p>
+<p align="center" style="max-width:600px; margin: 0 auto;">An add-in for Autodesk Fusion 360 that automates the creation of bores for 3D printing: <strong>heat-set insert holes</strong>, using insert dimension recommendations from <a href="https://cnckitchen.com">CNC Kitchen</a>, and <strong>Ridge Threads</strong> (M3, M4, M5), where the screw forms its own thread in the printed part.</p>
 
 ## Features
 
 -  **Pre-configured insert sizes** - CNC Kitchen’s recommended dimensions for common sizes (M2, M2.5, M3, M4, M5, M6, M8, M10, and 1/4"-20 camera thread)
+-  **Ridge Thread bores (M3, M4, M5)** - A bore with 3 or 4 small ridges inside. The screw forms its own thread in the ridges, so you need no insert. See [Ridge Thread](#ridge-thread)
 -  **Blind holes and through holes** - Automatically calculates correct depths
 - Automatic **top chamfer** (0.5 mm × 45°; fully customizable)
 - Automatic **bottom fillet** (0.5 mm radius; fully customizable)
@@ -36,6 +37,8 @@
 ## Why ThreadMeister?
 
 Tired of googling insert dimensions every time you need a bore for a heat-set insert? ThreadMeister has them built in — just pick your size and it creates the hole directly in your model. No more manual circle sketching, no more wrong depths, no more manual extrude cuts.
+
+No insert at hand? Use a **Ridge Thread** (M3, M4, M5). ThreadMeister cuts a bore with small ridges inside, and your screw forms its own thread in the 3D print. No heat-set insert, no tapping, no thread modelling — just pick the size and click OK.
 
 ## Platform Support
 
@@ -81,10 +84,13 @@ git clone git clone https://github.com/AndreasOKircher/ThreadMeister.git ThreadM
 3. Click the **"ThreadMeister"** button in **SOLID → MODIFY** menu
 4. **Select your target body** (the part to add holes to)
 5. **Select one or more sketch points**  
-6. Choose your **insert size** (e.g., M3 x 5.7mm standard)
-7. Choose **Blind Hole** or **Through Hole**
-8. Enable/disable top **chamfer** and bottom **fillet** (recommended: enabled)
-9. Click **OK**
+6. Choose the **Bore Type**: **Heat-Set Insert** or **Ridge Thread**
+7. Choose the **size** (e.g., M3 x 5.7mm standard for an insert, or M4 for a Ridge Thread)
+8. Choose **Blind Hole** or **Through Hole**
+9. Heat-Set Insert only: enable/disable top **chamfer** and bottom **fillet** (recommended: enabled)
+10. Click **OK**
+
+## Heat-Set Inserts
 
 ### Insert Specifications
 
@@ -108,9 +114,9 @@ All dimensions follow CNC Kitchen's official recommendations:
 
 **Note:** For blind holes, the total extrude depth = insert length + extra depth + chamfer (if enabled). For example, with an M3 x 5.7 mm insert and default settings: 5.7 + 1.0 extra + 0.5 chamfer = 7.2 mm. The chamfer is added to the extrude length because it cuts into the top of the bore and would otherwise reduce usable depth for the insert.
 
-### Customize settings
+### Customize settings (Heat-Set Inserts)
 
-Edit `config.ini` to adjust behavior. The file is located in the add-in folder. The config is organized into four sections:
+Edit `config.ini` to adjust behavior. The file is located in the add-in folder. The Ridge Thread setting is described under [Ridge Thread](#ridge-thread). The other sections are:
 
 **`[Settings]`** — Design parameters
 
@@ -147,6 +153,33 @@ M3 x 6mm (custom) = 4.6, 6.0, 1.8
 | `enable_debug_export` | False | Show "Export Debug JSON" checkbox in the dialog |
 
 
+
+## Ridge Thread
+
+A Ridge Thread is a bore a little larger than the screw, with 3 or 4 small ridges inside. The screw forms its own thread in the ridges. You need no heat-set insert.
+
+Follow the Quick Start above and set **Bore Type** to **Ridge Thread**.
+
+- Sizes: **M3**, **M4** or **M5**. M3 and M4 get 3 ridges. M5 gets 4 ridges.
+- Blind or through. For a blind bore, the default depth is 4 × the screw diameter. You can change it in the dialog.
+- The chamfer and bottom fillet options do not apply.
+
+Each ridge gets a lead-in chamfer (78°) at the bore entry. The Ridge Thread follows its sketch point if you move the point later.
+
+The inner diameter at the ridges is in `config.ini`, section `[Ridge Threads]` (in mm):
+
+```ini
+[Ridge Threads]
+M3 = 2.4
+M4 = 3.5
+M5 = 4.5
+```
+
+**Print tip:** orient the part so that one ridge points straight down. Use Ridge Threads up to M5.
+
+### Tested materials
+
+The default Ridge Thread dimensions are tested for **ASA** and **PETG**. For other materials, test first. You can change the inner diameter in `config.ini`.
 
 ## Screenshots
 
@@ -192,6 +225,9 @@ M3 x 6mm (custom) = 4.6, 6.0, 1.8
 
 
 ## Changelog
+
+### v1.3.0 — Unreleased
+- New: **Ridge Thread** bore type (M3, M4, M5) with lead-in chamfer; new `[Ridge Threads]` section in `config.ini`
 
 ### v1.2.5 — 2026-10-07
 - Fixed: add-in now loads automatically when Fusion starts after installation (`runOnStartup` was disabled in the manifests)
@@ -245,6 +281,9 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 - **Developed by**: [Andreas Kircher](https://github.com/AndreasOKircher)
 - **Code assistance**: CAI‑assisted coding using Perplexity / Claude
 - **Insert specifications**: [CNC Kitchen](https://cnckitchen.com)
+- **Ridge Thread concept**: [Thomas Sanladerer](https://toms3d.org/2025/01/14/a-better-way-to-add-threads-to-your-3d-prints/) (courtesy credit)
+- **First Fusion implementation of Ridge Threads**: Connor McComb, [ThreadMeisterExtended](https://github.com/kiwimccomb-maker/ThreadMeisterExtended)
+- Ridge Thread chamfer code adapted from ThreadMeisterExtended, © 2026 Connor McComb, MIT license.
 - **Animation recorded with**: [ScreenToGif](https://www.screentogif.com)
 
 

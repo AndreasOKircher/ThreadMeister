@@ -4,6 +4,7 @@ tm_execute.py – CommandExecuteHandler: orchestrates the hole creation loop.
 import adsk.core, adsk.fusion, traceback, os
 from . import tm_state
 from . import tm_config
+from . import tm_ridge
 from .tm_helpers import calc_blind_hole_depth_mm
 from .tm_geometry import (
     findProfileForCircle,
@@ -14,6 +15,9 @@ from .tm_geometry import (
     addChamferToEdge,
     findDistanceThroughBody,
     addBottomRadiusToBlindHole,
+    createRidgeThreadSketch,
+    getRidgeChamferEdges,
+    addAngleChamferToEdge,
 )
 
 
@@ -35,22 +39,44 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
             selectedPoints = [pointSelect.selection(i).entity for i in range(pointSelect.selectionCount)]
 
             insertName = insertSize.selectedItem.name
-            tm_config.save_last_selected_insert(insertName)
+            isRidge = inputs.itemById('boreType').selectedItem.name == tm_ridge.BORE_TYPE_RIDGE
 
             isBlindHole = holeType.selectedItem.name == 'Blind Hole'
-            includeChamfer = addChamfer.value
-            includeBottomRadius = addBottomRadius.value and isBlindHole
             showMessage = showSuccessMessage.value
 
-            tm_config.save_checkbox_states(includeChamfer, includeBottomRadius, showMessage, isBlindHole)
-
-            holeDia, insertLen, minWall = tm_state.INSERT_SPECS[insertName]
-            radius = holeDia / 2.0 / 10.0   # mm -> cm
+            if isRidge:
+                # Ridge Thread: no Chamfer / Bottom Radius options; depth from the dialog
+                tm_config.save_bore_type_state(tm_ridge.BORE_TYPE_RIDGE, insertName)
+                # Keep Hole Type and the success-message checkbox; leave the insert-only checkboxes as they were
+                tm_config.save_checkbox_states(
+                    tm_state.CONFIG.get('chamfer_enabled_default', True),
+                    tm_state.CONFIG.get('bottom_radius_enabled_default', False),
+                    showMessage, isBlindHole)
+                ridgeGeometry = tm_ridge.ridge_geometry(
+                    insertName, tm_state.RIDGE_THREAD_SPECS[insertName])
+                ridgeDepth = inputs.itemById('ridgeDepth').value   # cm
+                includeChamfer = False
+                includeBottomRadius = False
+                label = f'{insertName} Ridge Thread'
+                noun = 'Ridge Thread(s)'
+                radius = ridgeGeometry.bore_dia / 2.0 / 10.0   # mm -> cm
+            else:
+                tm_config.save_bore_type_state(
+                    tm_ridge.BORE_TYPE_INSERT, tm_state.CONFIG.get('last_ridge_thread', 'M3'))
+                tm_config.save_last_selected_insert(insertName)
+                includeChamfer = addChamfer.value
+                includeBottomRadius = addBottomRadius.value and isBlindHole
+                tm_config.save_checkbox_states(includeChamfer, includeBottomRadius, showMessage, isBlindHole)
+                holeDia, insertLen, minWall = tm_state.INSERT_SPECS[insertName]
+                label = insertName
+                noun = 'insert hole(s)'
+                radius = holeDia / 2.0 / 10.0   # mm -> cm
             diameter = radius * 2.0
 
             successCount = 0
             failedCount = 0
             failMessages = []
+            warnMessages = []
 
             component = targetBody.parentComponent
             design = component.parentDesign
@@ -73,19 +99,25 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
                     failMessages.append(f"Point {point_idx+1}: Could not find the sketch's face. Try placing the sketch on a construction plane.")
                     continue
                 tempSketch = component.sketches.addWithoutEdges(plane)
-                tempSketch.name = f"TM_{insertName}_P{point_idx+1}"
+                tempSketch.name = f"TM_{label}_P{point_idx+1}"
 
                 # Project original point to maintain parametric association
                 projectedEntities = tempSketch.project(point)
                 projectedPoint = projectedEntities.item(0)
 
-                # Create bore circle in clean sketch
-                circle = tempSketch.sketchCurves.sketchCircles.addByCenterRadius(
-                    projectedPoint.geometry, radius)
-                tempConstraints = tempSketch.geometricConstraints
-                tempConstraints.addCoincident(circle.centerSketchPoint, projectedPoint)
+                if isRidge:
+                    # Ridge Thread: bore + Ridges, all constrained to the projected point
+                    circle = None
+                    profile_or_collection = createRidgeThreadSketch(
+                        tempSketch, projectedPoint, ridgeGeometry)
+                else:
+                    # Create bore circle in clean sketch
+                    circle = tempSketch.sketchCurves.sketchCircles.addByCenterRadius(
+                        projectedPoint.geometry, radius)
+                    tempConstraints = tempSketch.geometricConstraints
+                    tempConstraints.addCoincident(circle.centerSketchPoint, projectedPoint)
 
-                profile_or_collection = findProfileForCircle(tempSketch, circle)
+                    profile_or_collection = findProfileForCircle(tempSketch, circle)
 
                 if profile_or_collection is None:
                     failedCount += 1
@@ -94,7 +126,7 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
                     continue
 
                 # Export debug JSON if enabled
-                if shouldExport:
+                if shouldExport and circle is not None:
                     try:
                         from .tm_debug_export import export_sketch_data
                         export_dir = os.path.join(
@@ -122,10 +154,13 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
                 extInput = extrudes.createInput(profile_or_collection, adsk.fusion.FeatureOperations.CutFeatureOperation)
 
                 if isBlindHole:
-                    chamfer = tm_state.CONFIG['chamfer_size'] if includeChamfer else 0.0
-                    depth_mm = calc_blind_hole_depth_mm(
-                        insertLen, tm_state.CONFIG['blind_hole_extra_depth'], chamfer)
-                    holeDepth = depth_mm / 10.0  # mm -> cm
+                    if isRidge:
+                        holeDepth = ridgeDepth
+                    else:
+                        chamfer = tm_state.CONFIG['chamfer_size'] if includeChamfer else 0.0
+                        depth_mm = calc_blind_hole_depth_mm(
+                            insertLen, tm_state.CONFIG['blind_hole_extra_depth'], chamfer)
+                        holeDepth = depth_mm / 10.0  # mm -> cm
                     dist = adsk.core.ValueInput.createByReal(holeDepth)
                     extent = adsk.fusion.DistanceExtentDefinition.create(dist)
                     extInput.setOneSideExtent(extent, cutDirection)
@@ -137,6 +172,16 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
 
                 extInput.participantBodies = [targetBody]
                 extrude = extrudes.add(extInput)
+
+                if isRidge:
+                    # Lead-in chamfer on the Ridge top edges; failure keeps the bore
+                    ridgeEdges = getRidgeChamferEdges(
+                        targetBody, tempSketch, projectedPoint.geometry, ridgeGeometry)
+                    if ridgeEdges is None or addAngleChamferToEdge(
+                            component, ridgeEdges, ridgeGeometry.chamfer,
+                            tm_ridge.CHAMFER_ANGLE_DEG) is None:
+                        warnMessages.append(
+                            f'Point {point_idx+1}: Ridge Thread created, but the lead-in chamfer could not be added.')
 
                 if includeChamfer:
                     chamferEdge = findChamferEdge(extrude, targetBody, parentSketch, center2d, diameter)
@@ -156,17 +201,18 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
                     endIndex = timeline.markerPosition - 1
                     if endIndex >= startIndex:
                         timelineGroup = timeline.timelineGroups.add(startIndex, endIndex)
-                        timelineGroup.name = f'({successCount}x {insertName})'
+                        timelineGroup.name = f'({successCount}x {label})'
                 except Exception:
                     pass
 
+            warnText = ('\n\nWarnings:\n' + '\n'.join(warnMessages)) if warnMessages else ''
             if failedCount > 0:
                 details = '\n'.join(failMessages)
                 tm_state._ui.messageBox(
-                    f'Created {successCount} insert hole(s), {failedCount} failed.\n\n{details}'
+                    f'Created {successCount} {noun}, {failedCount} failed.\n\n{details}{warnText}'
                 )
-            elif showMessage:
-                tm_state._ui.messageBox(f'Successfully created {successCount} insert hole(s).')
+            elif showMessage or warnMessages:
+                tm_state._ui.messageBox(f'Successfully created {successCount} {noun}.{warnText}')
 
         except Exception:
             tm_state._ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))

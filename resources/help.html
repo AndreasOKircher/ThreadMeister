@@ -17,7 +17,7 @@
 </head>
 <body>
 
-<h1>ThreadMeister &mdash; Heat-Set Insert Holes</h1>
+<h1>ThreadMeister &mdash; Heat-Set Insert &amp; Ridge Thread Holes</h1>
 
 <p>ThreadMeister automates the creation of heat-set insert holes in Fusion 360 using CNC Kitchen's tested insert dimensions.</p>
 
@@ -51,6 +51,18 @@
     <tr><td>1/4"-20 x 12.7mm</td><td>8.0mm</td><td>12.7mm</td></tr>
 </table>
 
+<h2>Ridge Thread</h2>
+<p>Set <strong>Bore Type</strong> to <strong>Ridge Thread</strong> to cut a bore with 3 or 4 small ridges inside. The screw forms its own thread in the ridges, so you need no insert.</p>
+<ul>
+    <li>Sizes: M3 and M4 (3 ridges), M5 (4 ridges).</li>
+    <li>Blind or through. The default blind depth is 4 &times; the screw diameter. You can change it in the dialog.</li>
+    <li>Each ridge gets a lead-in chamfer (78&deg;) at the bore entry.</li>
+    <li>The inner diameter at the ridges is in <code>config.ini</code>, section <code>[Ridge Threads]</code> (mm).</li>
+</ul>
+<div class="note">
+    <strong>Print tip:</strong> orient the part so that one ridge points straight down. Use Ridge Threads up to M5.
+</div>
+
 <h2>Chamfer &amp; Depth</h2>
 <p>The top chamfer (default 0.5 mm &times; 45&deg;) cuts into the bore, reducing usable depth for the insert. The <code>blind_hole_extra_depth</code> setting (default 1.0 mm) compensates for this and provides clearance below the insert.</p>
 
@@ -60,6 +72,9 @@
 
 <h2>Configuration</h2>
 <p>Edit <code>config.ini</code> in the add-in folder to customize chamfer size, extra depth, bottom fillet radius, and insert definitions. Custom inserts can be added in the <code>[Inserts]</code> section.</p>
+
+<h2>Credits</h2>
+<p>Ridge Thread concept: Thomas Sanladerer. First Fusion implementation: Connor McComb (ThreadMeisterExtended). Ridge Thread chamfer code adapted from ThreadMeisterExtended, &copy; 2026 Connor McComb, MIT license.</p>
 
 <h2>Support</h2>
 <p>Report issues or request features at:<br>

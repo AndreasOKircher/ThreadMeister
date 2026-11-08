@@ -108,8 +108,11 @@ that links back to the GitHub issue; the `.scratch/` file is where the work is t
 
 ### Branch workflow (per feature)
 
-- **One feature → one branch `<slug>-rN`**, cut from local `master`. All of the feature's
-  issues are implemented on it. `/start-feature` opens it, `/finish-feature` closes it.
+- **One feature → one branch `<slug>-rN`**, cut from up-to-date `origin/master`. All of the
+  feature's issues are implemented on it. `/start-feature` opens it, `/finish-feature` closes
+  it. Both run `scripts/feature_flow.py` (identical in Track-On-Topo) for every mechanical step.
+- **Merge = GitHub PR, the human clicks "Squash and merge".** `/finish-feature` opens the PR
+  with `gh`; the agent never merges.
 - **Docs escape hatch:** changes that cannot affect the add-in at runtime (`docs/`,
   `.scratch/`, markdown, comments, agent files) go straight to `master`.
 - Anything under `core/`, `ThreadMeister.py`, `config.ini`, `resources/`, or `tests/` needs
@@ -125,8 +128,9 @@ that links back to the GitHub issue; the `.scratch/` file is where the work is t
 - Stage selectively — only the issue's files. Never `git add -A`.
 - **Pushing a feature branch** (`<slug>-rN`, or the branch a cloud session was assigned) needs
   no approval — it's how code reaches the user's PC for Fusion smoke tests.
-- **Always ask before:** pushing to `master`, force-push, history rewrites, deleting branches
-  outside `/finish-feature`.
+- **Always ask before:** pushing to `master` (this includes the local "tracker -> merged"
+  commit that `/finish-feature` leaves on `master`), merging a PR, force-push, history
+  rewrites, deleting branches outside `/finish-feature`.
 - Issue code done but its manual Fusion smoke test still open → commit anyway with
   `Status: ready-for-human`. After the user confirms the smoke test, flip it to `completed`
   in a small follow-up commit (or inside `/finish-feature`).
