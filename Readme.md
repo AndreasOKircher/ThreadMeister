@@ -179,7 +179,7 @@ M5 = 4.5
 
 ### Tested materials
 
-The default Ridge Thread dimensions are tested for **ASA** and **PETG**. For other materials or printers, test first. You can change the inner diameter in `config.ini`.
+The default Ridge Thread dimensions are tested for **ASA** and **PETG**. For other materials, test first. You can change the inner diameter in `config.ini`.
 
 ## Screenshots
 

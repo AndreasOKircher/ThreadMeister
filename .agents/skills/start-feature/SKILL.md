@@ -1,12 +1,15 @@
 ---
 name: start-feature
-description: Start a feature round on a branch in the repo working tree. Claims the feature's issues on master (sets them on-branch, seeds the .feature-status.md tracker), then creates one branch <slug>-rN from local master where ALL of that feature's issues are implemented. Use when starting (or extending) implementation of a feature whose issues are ready-for-agent. Pairs with /finish-feature.
+model: haiku
+description: Start a feature round on a branch in the repo working tree. Runs scripts/feature_flow.py, which creates one branch <slug>-rN from up-to-date origin/master (or keeps the cloud session's claude/… branch), then claims the feature's issues in the branch's first commit (sets them on-branch, seeds the .feature-status.md tracker). ALL of that feature's issues are implemented on that branch. Use when starting (or extending) implementation of a feature whose issues are ready-for-agent. Pairs with /finish-feature.
 ---
 
 # Start Feature
 
 Open the **one** branch where a whole feature round is implemented. One feature-slug →
 one branch `<slug>-rN`, shared by every issue in that feature.
+
+**All mechanical steps are in `scripts/feature_flow.py`. Do not repeat them by hand.**
 
 ## When to use
 
@@ -23,44 +26,28 @@ Not for docs-only / `.scratch/` edits — those go straight to `master`.
 
 ## Process
 
-### 0. Clean tree
-
-`git status`. If dirty: commit, stash, or ask the user before continuing.
-
-### 1. Switch to `master`
-
-`git checkout master`. The claim commit in step 3 must land on `master`, and the branch in
-step 4 is cut from it.
-
-### 2. Pick the round number N
-
-Read `round:` from `.scratch/<slug>/.feature-status.md` — merged branches are deleted by
-`/finish-feature`, so `git branch` can't tell you the history. No tracker yet → `r1`;
-otherwise the next integer.
-
-### 3. Claim on `master` first
-
-1. For each in-round issue, flip `Status:` from `ready-for-agent` to `on-branch`.
-2. Create/update `.scratch/<slug>/.feature-status.md`:
-
-   ```markdown
-   status: in-progress
-   branch: <slug>-rN
-   round: N
-   issues:
-     - <NN>-<slug>
-   ```
-
-3. Commit on `master`:
-   `git add .scratch/<slug>/ && git commit -m "start(<slug>): claim round rN -> on-branch"`
-
-### 4. Cut the branch from local `master`
+### 1. Run the script
 
 ```
-git checkout -b <slug>-rN
+python scripts/feature_flow.py start <slug>
+python scripts/feature_flow.py start <slug> --issues 01-a 02-b    # only some issues
 ```
 
-### 5. Work
+It checks that no tracked file is dirty, picks the round number N (tracker + existing
+branches), cuts `<slug>-rN` from up-to-date `origin/master` (cloud session: keeps the
+`claude/…` branch), flips the issues to `on-branch`, writes `.feature-status.md`
+(an earlier round becomes a history section) and makes the claim commit
+`start(<slug>): claim round rN -> on-branch` **on the branch**.
+
+If the output has a line starting with `STOP:`, do what it says (a dirty tree means
+ask the user: commit, stash, or abort) and run the script again. Never work around it
+with manual git commands.
+
+### 2. Report
+
+Show the user the script's output: round number, branch, claimed issues.
+
+### 3. Work
 
 Implement every issue on this branch. For each issue: `/tdd` for the Fusion-free logic,
 `python -m pytest -q` green, then add the Implementation Summary and commit (one commit per
@@ -68,6 +55,6 @@ issue). Status in that commit: `completed` if nothing is left to check; `ready-f
 manual Fusion smoke test is still open — tell the user what to check. When all issues are
 done, run `/finish-feature`.
 
-## Report
+## Notes
 
-Round number, branch name, claimed issues, and that work is now on `<slug>-rN`.
+- `scripts/feature_flow.py` is identical in Track-On-Topo and ThreadMeister. Change both.

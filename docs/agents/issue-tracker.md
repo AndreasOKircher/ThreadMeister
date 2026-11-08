@@ -23,28 +23,35 @@ Before writing an issue, read the most recent sibling issues and copy the struct
 
 ## Branch isolation (per feature)
 
-- **One branch `<slug>-rN` per feature**, cut from local `master`, shared by all of that
-  feature's issues. Never one branch per issue, never code directly on `master`.
-- **Clean tree before switching branches** — commit or stash first.
+- **One branch `<slug>-rN` per feature**, cut from up-to-date `origin/master`, shared by all of
+  that feature's issues. Never one branch per issue, never code directly on `master`.
+- **Clean tree before switching branches** — commit or stash first (the script stops on
+  uncommitted changes to tracked files).
 - **Docs escape hatch:** docs, `.scratch/`, markdown, and agent-workflow files go straight to
   `master`.
-- **Merge is agent-executed, human-gated.** `/finish-feature` runs the tests, runs
-  `/code-review`, asks *merge now?*, then squash-merges, re-runs tests, and flips the tracker.
+- **Merge = GitHub PR, human-gated.** `/finish-feature` runs `/code-review`, the tests, pushes
+  the branch and opens the PR. The human clicks **Squash and merge**. The agent never merges.
   Agents may push feature branches freely; pushing `master` needs approval.
+- **Mechanical steps live in `scripts/feature_flow.py`** (`start`, `issues`, `tests`,
+  `open-pr`, `after-merge`) — the same file as in Track-On-Topo. The skills call it; the model
+  only codes, reviews and writes the PR text.
 
 ### Status-flip timing
 
-An issue flips to `completed` on the feature branch when its commit lands. On `master` it
-reads `on-branch` until the feature squash-merges.
+The claim (`ready-for-agent` -> `on-branch`) is the branch's first commit. An issue flips to
+`completed` on the feature branch when its commit lands. `master` sees both only after the PR
+is squash-merged.
 
 ### The feature tracker (`.feature-status.md`)
 
-Kept on `master` at the feature root (outside `issues/`):
+Lives at the feature root (outside `issues/`), claimed on the feature branch. Earlier rounds
+stay below as `## Round N (merged)` sections:
 
 ```markdown
 status: in-progress        # in-progress | awaiting-review | post-merge-test-failed | merged
 branch: <slug>-rN
 round: N
+pr:                        # filled by `feature_flow.py open-pr`
 issues:
   - <NN>-<slug>
 ```
@@ -52,7 +59,7 @@ issues:
 ### Extending a shipped feature
 
 Add new issue files to the existing `.scratch/<slug>/` folder and cut `<slug>-r(N+1)` from
-current `master`. Never reopen a terminal issue (`completed` / `wontfix` / `superseded` /
+current `master` (`python scripts/feature_flow.py start <slug>` does it). Never reopen a terminal issue (`completed` / `wontfix` / `superseded` /
 `closed`) — file a new one.
 
 ## Decision records
