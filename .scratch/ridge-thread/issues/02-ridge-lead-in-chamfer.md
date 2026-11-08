@@ -1,6 +1,6 @@
 # Ridge Thread lead-in chamfer
 
-Status: ready-for-human
+Status: completed
 
 ## Parent
 
@@ -37,4 +37,4 @@ Ridge Thread (no checkbox).
 
 ## Implementation Summary
 
-Added `is_ridge_top_edge` and `CHAMFER_ANGLE_DEG` to `core/tm_ridge.py` (pure, unit-tested in `tests/test_ridge.py`). Added `getRidgeChamferEdges` and `addAngleChamferToEdge` to `core/tm_geometry.py` (Temp Sketch transform, no `referencePlane`). `core/tm_execute.py` chamfers after the Ridge cut; on failure the bore stays and a warning is added to the result message. Chamfer distance per size comes from the existing `RidgeGeometry.chamfer`. Fusion smoke test still open.
+Added `is_ridge_top_edge` and `CHAMFER_ANGLE_DEG` to `core/tm_ridge.py` (pure, unit-tested in `tests/test_ridge.py`). Added `getRidgeChamferEdges` and `addAngleChamferToEdge` to `core/tm_geometry.py` (Temp Sketch transform, no `referencePlane`). `core/tm_execute.py` chamfers after the Ridge cut; on failure the bore stays and a warning is added to the result message. Chamfer distance per size comes from the existing `RidgeGeometry.chamfer`. Fusion smoke test passed (M3/M4/M5, through hole, Heat-Set Insert unchanged).
