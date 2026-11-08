@@ -1,6 +1,6 @@
 # Ridge Thread lead-in chamfer
 
-Status: on-branch
+Status: ready-for-human
 
 ## Parent
 
@@ -24,8 +24,8 @@ Ridge Thread (no checkbox).
 
 ## Acceptance criteria
 
-- [ ] Unit test for any pure edge-filter maths that can run without Fusion.
-- [ ] `python -m pytest -q` passes.
+- [x] Unit test for any pure edge-filter maths that can run without Fusion.
+- [x] `python -m pytest -q` passes.
 - [ ] Manual Fusion smoke: M3 / M4 / M5 blind and through — each ridge top edge has the
       chamfer; bottom edges of a through hole and other Ridge Threads in the body are not
       chamfered.
@@ -37,4 +37,4 @@ Ridge Thread (no checkbox).
 
 ## Implementation Summary
 
-<Filled at issue close.>
+Added `is_ridge_top_edge` and `CHAMFER_ANGLE_DEG` to `core/tm_ridge.py` (pure, unit-tested in `tests/test_ridge.py`). Added `getRidgeChamferEdges` and `addAngleChamferToEdge` to `core/tm_geometry.py` (Temp Sketch transform, no `referencePlane`). `core/tm_execute.py` chamfers after the Ridge cut; on failure the bore stays and a warning is added to the result message. Chamfer distance per size comes from the existing `RidgeGeometry.chamfer`. Fusion smoke test still open.

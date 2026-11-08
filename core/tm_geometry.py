@@ -6,6 +6,7 @@ import adsk.core, adsk.fusion, traceback
 import math
 from itertools import combinations
 from . import tm_state
+from . import tm_ridge
 
 # Profile point margin: profiles must have ALL endpoints within circle_radius * (1 + this margin)
 PROFILE_POINT_MARGIN = 0.05
@@ -740,3 +741,65 @@ def findRidgeThreadProfile(sketch, center, geometry):
     if best is None or bestDiff > expected * 0.02:
         return None
     return best
+
+
+def getRidgeChamferEdges(targetBody, tempSketch, projectedPoint2d, geometry):
+    """
+    Find the Ridge top arc edges at the Bore entry (in the Temp Sketch plane).
+
+    Uses the Temp Sketch transform, not Sketch.referencePlane (ADR-0002). The edge test
+    itself is tm_ridge.is_ridge_top_edge (mm); Fusion lengths are cm.
+
+    Returns:
+        ObjectCollection with geometry.count edges, or None if not all were found.
+    """
+    try:
+        center3D = adsk.core.Point3D.create(projectedPoint2d.x, projectedPoint2d.y, 0.0)
+        center3D.transformBy(tempSketch.transform)
+        (_origin, _xAxis, _yAxis, zAxis) = tempSketch.transform.getAsCoordinateSystem()
+
+        found = adsk.core.ObjectCollection.create()
+        for edge in targetBody.edges:
+            curveType = edge.geometry.curveType
+            if (curveType != adsk.core.Curve3DTypes.Arc3DCurveType and
+                    curveType != adsk.core.Curve3DTypes.Circle3DCurveType):
+                continue
+            curve = edge.geometry
+            normal = curve.normal
+            if abs(normal.x * zAxis.x + normal.y * zAxis.y + normal.z * zAxis.z) < 0.99:
+                continue
+            vec = adsk.core.Vector3D.create(
+                curve.center.x - center3D.x,
+                curve.center.y - center3D.y,
+                curve.center.z - center3D.z)
+            axial = vec.x * zAxis.x + vec.y * zAxis.y + vec.z * zAxis.z
+            radial = math.sqrt(max(0.0, vec.length ** 2 - axial ** 2))
+            if tm_ridge.is_ridge_top_edge(geometry, curve.radius * 10.0,
+                                          axial * 10.0, radial * 10.0):
+                found.add(edge)
+
+        if found.count < geometry.count:
+            return None
+        return found
+    except Exception:
+        return None
+
+
+def addAngleChamferToEdge(component, edges, chamferSize, angleDeg):
+    """
+    Chamfer an ObjectCollection of edges: distance (mm) and angle from the face plane.
+
+    Returns:
+        The chamfer feature, or None if failed.
+    """
+    try:
+        if edges is None:
+            return None
+        chamfers = component.features.chamferFeatures
+        chamferInput = chamfers.createInput(edges, False)
+        chamferInput.setToDistanceAndAngle(
+            adsk.core.ValueInput.createByReal(chamferSize / 10.0),
+            adsk.core.ValueInput.createByReal(math.radians(angleDeg)))
+        return chamfers.add(chamferInput)
+    except Exception:
+        return None

@@ -30,6 +30,8 @@ BORE_TYPE_RIDGE = 'Ridge Thread'
 # Default inner diameter at the Ridges (user print tests, PRD): config.ini [Ridge Threads]
 DEFAULT_INNER_DIA = {'M3': 2.40, 'M4': 3.50, 'M5': 4.50}
 
+CHAMFER_ANGLE_DEG = 78.0  # lead-in chamfer angle from the face plane
+
 DEFAULT_DEPTH_FACTOR = 4.0  # default blind depth = 4 x screw diameter
 
 
@@ -39,6 +41,19 @@ def ridge_geometry(size, inner_dia_mm):
     ridge_dia = 2.0 * arc_distance - inner_dia_mm
     return RidgeGeometry(bore_dia, arc_distance, count, ridge_dia, chamfer,
                          DEFAULT_DEPTH_FACTOR * screw_dia)
+
+
+def is_ridge_top_edge(g, radius_mm, axial_offset_mm, radial_offset_mm):
+    """True if an arc edge is a Ridge top edge of THIS Bore (for the lead-in chamfer).
+
+    radius_mm: arc radius. axial_offset_mm: distance of the arc centre from the sketch
+    plane. radial_offset_mm: distance of the arc centre from this Bore's axis.
+    """
+    if abs(radius_mm - g.ridge_dia / 2.0) > 0.05:
+        return False
+    if abs(axial_offset_mm) > 0.05:
+        return False
+    return abs(radial_offset_mm - g.arc_distance) <= max(0.1, g.ridge_dia / 2.0 * 0.5)
 
 
 def _lens_area(R, r, d):

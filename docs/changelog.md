@@ -2,6 +2,7 @@
 
 ## 1.3.0 — Unreleased — Ridge Thread
 - **New Bore Type: Ridge Thread** (M3, M4, M5). A bore a little larger than the screw with 3 or 4 Ridges inside; the screw forms its own thread in the Ridges, so no Insert is needed. Pick it in the new "Bore Type" dropdown. Blind or through; blind depth defaults to 4 × screw diameter and can be changed in the dialog.
+- Ridge Threads get a lead-in chamfer on each Ridge top edge (78°, 0.28 / 0.33 / 0.37 mm for M3 / M4 / M5). If the chamfer fails, the bore stays and a warning is shown.
 - The Ridge Thread follows its Sketch Point when the point is moved later.
 - `config.ini` gets a `[Ridge Threads]` section (inner diameter at the Ridges per size). Existing configs get it added automatically.
 - Comment lines (`# ...`) in `config.ini` are now kept when the add-in saves the dialog state.

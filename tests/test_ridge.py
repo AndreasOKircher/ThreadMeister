@@ -4,7 +4,7 @@ Unit tests for tm_ridge.py: Ridge Thread geometry (pure maths, no Fusion).
 
 import math
 import pytest
-from core.tm_ridge import ridge_geometry, central_profile_area_mm2
+from core.tm_ridge import ridge_geometry, central_profile_area_mm2, is_ridge_top_edge
 
 
 def _grid_area_mm2(g, step=0.01):
@@ -58,3 +58,32 @@ class TestCentralProfileArea:
     def test_smaller_than_bore_circle(self):
         g = ridge_geometry('M3', 2.40)
         assert central_profile_area_mm2(g) < math.pi * (g.bore_dia / 2.0) ** 2
+
+
+class TestLeadInChamfer:
+    """Lead-in chamfer distance per size and the Ridge top-edge filter (values from the issue)."""
+
+    @pytest.mark.parametrize('size, inner, expected', [
+        ('M3', 2.40, 0.28), ('M4', 3.50, 0.33), ('M5', 4.50, 0.37)])
+    def test_chamfer_distance_per_size(self, size, inner, expected):
+        assert ridge_geometry(size, inner).chamfer == expected
+
+    def test_top_edge_of_this_bore_matches(self):
+        g = ridge_geometry('M4', 3.50)   # ridge_dia 2.0 * 2.75 - 3.5 = 2.0
+        assert is_ridge_top_edge(g, radius_mm=1.0, axial_offset_mm=0.0,
+                                 radial_offset_mm=2.75)
+
+    def test_bottom_edge_of_through_hole_is_rejected(self):
+        g = ridge_geometry('M4', 3.50)
+        assert not is_ridge_top_edge(g, radius_mm=1.0, axial_offset_mm=-16.0,
+                                     radial_offset_mm=2.75)
+
+    def test_edge_of_other_ridge_bore_is_rejected(self):
+        g = ridge_geometry('M4', 3.50)
+        assert not is_ridge_top_edge(g, radius_mm=1.0, axial_offset_mm=0.0,
+                                     radial_offset_mm=12.0)
+
+    def test_edge_with_wrong_radius_is_rejected(self):
+        g = ridge_geometry('M4', 3.50)
+        assert not is_ridge_top_edge(g, radius_mm=2.1, axial_offset_mm=0.0,
+                                     radial_offset_mm=2.75)

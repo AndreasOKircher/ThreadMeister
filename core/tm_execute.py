@@ -16,6 +16,8 @@ from .tm_geometry import (
     findDistanceThroughBody,
     addBottomRadiusToBlindHole,
     createRidgeThreadSketch,
+    getRidgeChamferEdges,
+    addAngleChamferToEdge,
 )
 
 
@@ -69,6 +71,7 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
             successCount = 0
             failedCount = 0
             failMessages = []
+            warnMessages = []
 
             component = targetBody.parentComponent
             design = component.parentDesign
@@ -165,6 +168,16 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
                 extInput.participantBodies = [targetBody]
                 extrude = extrudes.add(extInput)
 
+                if isRidge:
+                    # Lead-in chamfer on the Ridge top edges; failure keeps the bore
+                    ridgeEdges = getRidgeChamferEdges(
+                        targetBody, tempSketch, projectedPoint.geometry, ridgeGeometry)
+                    if ridgeEdges is None or addAngleChamferToEdge(
+                            component, ridgeEdges, ridgeGeometry.chamfer,
+                            tm_ridge.CHAMFER_ANGLE_DEG) is None:
+                        warnMessages.append(
+                            f'Point {point_idx+1}: Ridge Thread created, but the lead-in chamfer could not be added.')
+
                 if includeChamfer:
                     chamferEdge = findChamferEdge(extrude, targetBody, parentSketch, center2d, diameter)
                     if chamferEdge:
@@ -187,13 +200,14 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
                 except Exception:
                     pass
 
+            warnText = ('\n\nWarnings:\n' + '\n'.join(warnMessages)) if warnMessages else ''
             if failedCount > 0:
                 details = '\n'.join(failMessages)
                 tm_state._ui.messageBox(
-                    f'Created {successCount} {noun}, {failedCount} failed.\n\n{details}'
+                    f'Created {successCount} {noun}, {failedCount} failed.\n\n{details}{warnText}'
                 )
-            elif showMessage:
-                tm_state._ui.messageBox(f'Successfully created {successCount} {noun}.')
+            elif showMessage or warnMessages:
+                tm_state._ui.messageBox(f'Successfully created {successCount} {noun}.{warnText}')
 
         except Exception:
             tm_state._ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
