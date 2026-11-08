@@ -248,6 +248,8 @@ def _write_config_file(config_file=None):
     config.set('UI State', 'show_success_message', str(tm_state.CONFIG.get('show_success_message', True)))
     config.set('UI State', 'hole_type_blind', str(tm_state.CONFIG.get('hole_type_blind', True)))
     config.set('UI State', 'last_selected_insert', tm_state.CONFIG.get('last_selected_insert', 'M3 x 5.7mm (standard)'))
+    config.set('UI State', 'last_bore_type', tm_state.CONFIG.get('last_bore_type', 'Heat-Set Insert'))
+    config.set('UI State', 'last_ridge_thread', tm_state.CONFIG.get('last_ridge_thread', 'M3'))
 
     # [Developer]
     config.add_section('Developer')

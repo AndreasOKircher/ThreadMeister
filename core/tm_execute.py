@@ -47,6 +47,11 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
             if isRidge:
                 # Ridge Thread: no Chamfer / Bottom Radius options; depth from the dialog
                 tm_config.save_bore_type_state(tm_ridge.BORE_TYPE_RIDGE, insertName)
+                # Keep Hole Type and the success-message checkbox; leave the insert-only checkboxes as they were
+                tm_config.save_checkbox_states(
+                    tm_state.CONFIG.get('chamfer_enabled_default', True),
+                    tm_state.CONFIG.get('bottom_radius_enabled_default', False),
+                    showMessage, isBlindHole)
                 ridgeGeometry = tm_ridge.ridge_geometry(
                     insertName, tm_state.RIDGE_THREAD_SPECS[insertName])
                 ridgeDepth = inputs.itemById('ridgeDepth').value   # cm

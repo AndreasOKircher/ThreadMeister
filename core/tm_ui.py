@@ -140,7 +140,9 @@ class ValidateInputsHandler(adsk.core.ValidateInputsEventHandler):
 
             if bodySelect.selectionCount == 0 or pointSelect.selectionCount == 0:
                 args.areInputsValid = False
-            elif isRidgeSelected(inputs) and inputs.itemById('ridgeDepth').value <= 0:
+            elif (isRidgeSelected(inputs)
+                  and inputs.itemById('holeType').selectedItem.name == 'Blind Hole'
+                  and inputs.itemById('ridgeDepth').value <= 0):
                 args.areInputsValid = False
             else:
                 args.areInputsValid = True
