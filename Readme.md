@@ -38,6 +38,8 @@
 
 Tired of googling insert dimensions every time you need a bore for a heat-set insert? ThreadMeister has them built in — just pick your size and it creates the hole directly in your model. No more manual circle sketching, no more wrong depths, no more manual extrude cuts.
 
+No insert at hand? Use a **Ridge Thread** (M3, M4, M5). ThreadMeister cuts a bore with small ridges inside, and your screw forms its own thread in the 3D print. No heat-set insert, no tapping, no thread modelling — just pick the size and click OK.
+
 ## Platform Support
 
 - **Windows**: Fully tested  
