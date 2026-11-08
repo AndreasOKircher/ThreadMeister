@@ -14,7 +14,7 @@
   <img src="resources/images/Title_RidgeThread_v6.png" alt="ThreadMeister: Ridge Thread and Heat-Set Insert" width="600">
 </div>
 
-<p align="center" style="max-width:600px; margin: 0 auto;">An add-in for Autodesk Fusion 360 that automates the creation of heat-set insert holes for 3D printing, using insert dimension recommendations from <a href="https://cnckitchen.com">CNC Kitchen</a>.</p>
+<p align="center" style="max-width:600px; margin: 0 auto;">An add-in for Autodesk Fusion 360 that automates the creation of bores for 3D printing: <strong>heat-set insert holes</strong>, using insert dimension recommendations from <a href="https://cnckitchen.com">CNC Kitchen</a>, and <strong>Ridge Threads</strong> (M3, M4, M5), where the screw forms its own thread in the printed part.</p>
 
 ## Features
 
