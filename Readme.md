@@ -133,6 +133,10 @@ M5 = 4.5
 
 **Print tip:** orient the part so that one ridge points straight down. Use Ridge Threads up to M5.
 
+#### Tested materials
+
+The default Ridge Thread dimensions are tested for **ASA** and **PETG**. For other materials or printers, test first. You can change the inner diameter in `config.ini`.
+
 ### Customize settings
 
 Edit `config.ini` to adjust behavior. The file is located in the add-in folder. The config is organized into four sections:
