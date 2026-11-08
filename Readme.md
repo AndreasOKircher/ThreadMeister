@@ -84,10 +84,13 @@ git clone git clone https://github.com/AndreasOKircher/ThreadMeister.git ThreadM
 3. Click the **"ThreadMeister"** button in **SOLID → MODIFY** menu
 4. **Select your target body** (the part to add holes to)
 5. **Select one or more sketch points**  
-6. Choose your **insert size** (e.g., M3 x 5.7mm standard)
-7. Choose **Blind Hole** or **Through Hole**
-8. Enable/disable top **chamfer** and bottom **fillet** (recommended: enabled)
-9. Click **OK**
+6. Choose the **Bore Type**: **Heat-Set Insert** or **Ridge Thread**
+7. Choose the **size** (e.g., M3 x 5.7mm standard for an insert, or M4 for a Ridge Thread)
+8. Choose **Blind Hole** or **Through Hole**
+9. Heat-Set Insert only: enable/disable top **chamfer** and bottom **fillet** (recommended: enabled)
+10. Click **OK**
+
+## Heat-Set Inserts
 
 ### Insert Specifications
 
@@ -111,35 +114,9 @@ All dimensions follow CNC Kitchen's official recommendations:
 
 **Note:** For blind holes, the total extrude depth = insert length + extra depth + chamfer (if enabled). For example, with an M3 x 5.7 mm insert and default settings: 5.7 + 1.0 extra + 0.5 chamfer = 7.2 mm. The chamfer is added to the extrude length because it cuts into the top of the bore and would otherwise reduce usable depth for the insert.
 
-### Ridge Thread
+### Customize settings (Heat-Set Inserts)
 
-A Ridge Thread is a bore a little larger than the screw, with 3 or 4 small ridges inside. The screw forms its own thread in the ridges. You need no heat-set insert.
-
-1. Follow the Quick Start above, but set **Bore Type** to **Ridge Thread**.
-2. Choose the size: **M3**, **M4** or **M5**. M3 and M4 get 3 ridges. M5 gets 4 ridges.
-3. Choose **Blind** or **Through**. For a blind bore, the default depth is 4 × the screw diameter. You can change it in the dialog.
-4. Click **OK**.
-
-Each ridge gets a lead-in chamfer (78°) at the bore entry. The Ridge Thread follows its sketch point if you move the point later.
-
-The inner diameter at the ridges is in `config.ini`, section `[Ridge Threads]` (in mm):
-
-```ini
-[Ridge Threads]
-M3 = 2.4
-M4 = 3.5
-M5 = 4.5
-```
-
-**Print tip:** orient the part so that one ridge points straight down. Use Ridge Threads up to M5.
-
-#### Tested materials
-
-The default Ridge Thread dimensions are tested for **ASA** and **PETG**. For other materials or printers, test first. You can change the inner diameter in `config.ini`.
-
-### Customize settings
-
-Edit `config.ini` to adjust behavior. The file is located in the add-in folder. The config is organized into four sections:
+Edit `config.ini` to adjust behavior. The file is located in the add-in folder. The Ridge Thread setting is described under [Ridge Thread](#ridge-thread). The other sections are:
 
 **`[Settings]`** — Design parameters
 
@@ -176,6 +153,33 @@ M3 x 6mm (custom) = 4.6, 6.0, 1.8
 | `enable_debug_export` | False | Show "Export Debug JSON" checkbox in the dialog |
 
 
+
+## Ridge Thread
+
+A Ridge Thread is a bore a little larger than the screw, with 3 or 4 small ridges inside. The screw forms its own thread in the ridges. You need no heat-set insert.
+
+Follow the Quick Start above and set **Bore Type** to **Ridge Thread**.
+
+- Sizes: **M3**, **M4** or **M5**. M3 and M4 get 3 ridges. M5 gets 4 ridges.
+- Blind or through. For a blind bore, the default depth is 4 × the screw diameter. You can change it in the dialog.
+- The chamfer and bottom fillet options do not apply.
+
+Each ridge gets a lead-in chamfer (78°) at the bore entry. The Ridge Thread follows its sketch point if you move the point later.
+
+The inner diameter at the ridges is in `config.ini`, section `[Ridge Threads]` (in mm):
+
+```ini
+[Ridge Threads]
+M3 = 2.4
+M4 = 3.5
+M5 = 4.5
+```
+
+**Print tip:** orient the part so that one ridge points straight down. Use Ridge Threads up to M5.
+
+### Tested materials
+
+The default Ridge Thread dimensions are tested for **ASA** and **PETG**. For other materials or printers, test first. You can change the inner diameter in `config.ini`.
 
 ## Screenshots
 
