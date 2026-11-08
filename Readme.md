@@ -226,7 +226,7 @@ The default Ridge Thread dimensions are tested for **ASA** and **PETG**. For oth
 
 ## Changelog
 
-### v1.3.0 — Unreleased
+### v1.3.0 — 2026-11-08
 - New: **Ridge Thread** bore type (M3, M4, M5) with lead-in chamfer; new `[Ridge Threads]` section in `config.ini`
 
 ### v1.2.5 — 2026-10-07
