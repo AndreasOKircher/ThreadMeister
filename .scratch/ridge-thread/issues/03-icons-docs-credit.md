@@ -1,6 +1,6 @@
 # Bore Type icons, user docs and credits
 
-Status: on-branch
+Status: completed
 
 ## Parent
 
@@ -28,10 +28,10 @@ replaced, drop "Icons and" from the credit line; the chamfer-code credit stays.
 
 ## Acceptance criteria
 
-- [ ] Manual Fusion smoke: Bore Type dropdown shows an icon next to each item.
-- [ ] Packaged zip (`scripts\package.bat`) contains the icon folders.
-- [ ] Readme, help.html and changelog describe Ridge Thread; credits present.
-- [ ] `python -m pytest -q` passes.
+- [x] ~~Bore Type dropdown icons~~ dropped by user decision.
+- [x] ~~Icon folders in zip~~ dropped (no icons). `package.bat` already copies `tm_ridge.py`.
+- [x] Readme, help.html and changelog describe Ridge Thread; credits present.
+- [x] `python -m pytest -q` passes.
 
 ## Blocked by
 
@@ -39,4 +39,4 @@ replaced, drop "Icons and" from the credit line; the chamfer-code credit stays.
 
 ## Implementation Summary
 
-<Filled at issue close.>
+User decision (2026-11-08): NO Bore Type icons (no icon idea for Ridge Thread yet), so no icons were copied and no dropdown change was made. Docs: `Readme.md` (Ridge Thread section, v1.3.0 changelog, credits, new header picture `resources/images/Title_RidgeThread_v6.png`), `resources/help.html` (Ridge Thread + Credits), `License.txt` (chamfer-code credit; the "Icons and" part is dropped because no icons were copied). `docs/changelog.md` was already updated in issues 01-02. Tests pass. Docs-only issue, no Fusion smoke test needed.
