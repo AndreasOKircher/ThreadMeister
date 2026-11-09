@@ -97,6 +97,12 @@ _Avoid_: countersink
 Optional fillet on the floor edge of a Blind Hole (`bottom_radius_size`).
 _Avoid_: bottom fillet (in UI text), rounding
 
+**Bore Preview**:
+The translucent red display of the material the Bores will remove, shown while the dialog is
+open and before OK. Exact: it includes Chamfer, Bottom Radius and Ridges. Can be turned off
+with the dialog's Show Preview checkbox.
+_Avoid_: live preview, ghost, tool body
+
 ### Fusion model
 
 **Timeline Group**:

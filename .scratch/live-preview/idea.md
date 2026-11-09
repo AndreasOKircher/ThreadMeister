@@ -1,32 +1,20 @@
 # live-preview
 
-Draw a translucent cylinder at each selected Sketch Point with Fusion's CustomGraphics API
-while the dialog is open, updating when insert size / hole type changes — like Fusion's own
-Hole command. Catches "wrong size selected" before anything hits the timeline.
+Show the Bores while the dialog is open, before OK: the material that will be removed appears
+translucent red, like Fusion's own Extrude Cut preview. Catches "wrong size / wrong point /
+wrong depth" before anything hits the timeline.
 
 ## Open questions
 
-- ~~CustomGraphics vs the command's `executePreview` event?~~ Decided 2026-11-09, see below.
-- Preview of Chamfer and Bottom Radius: build them as temporary geometry too, or show only the cylinder?
-- Preview depth for Through Holes without computing the through distance?
-- Performance with many points.
+All resolved in the /grill-with-docs session of 2026-11-09 — see the decision record in
+[issues/01-custom-graphics-preview.md](issues/01-custom-graphics-preview.md).
 
-## Decision 2026-11-09: CustomGraphics, red translucent
+## History
 
-The user wants the look of Fusion's own cut tool body: translucent red, shown as soon as body
-and Sketch Points are selected. Chosen approach:
-
-- Build each Bore as a temporary body with `TemporaryBRepManager` (cylinder; later Chamfer /
-  Bottom Radius).
-- Draw it with `CustomGraphicsGroup.addBRepBody`, red solid colour, `setOpacity(~0.4, True)`.
-- Redraw in the command's `executePreview` event (fires on every selection / input change).
-  `isValidResult` stays False, so OK still runs the normal execute path.
-- The body is not changed until OK.
-
-Rejected: running the real Bore code in `executePreview` (shows the finished cut, not a red tool
-body; slower with many points).
-
-Assumption: speed and look must be confirmed by a smoke test in Fusion.
+- 2026-11-09 (earlier the same day): first choice was hand-built `TemporaryBRepManager`
+  cylinders drawn as CustomGraphics. Replaced in the grill session by D2 (real cut in
+  `executePreview` + red removed material), because hand-built shapes cannot match the real
+  Chamfer on slanted / curved entry faces or when Fusion fails to make the Chamfer.
 
 API refs:
 - https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/CustomGraphicsBRepBody_setOpacity.htm
