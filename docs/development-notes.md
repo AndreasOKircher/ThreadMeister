@@ -53,7 +53,6 @@ ThreadMeister/
 │   ├── test_geometry.py      ← Tests for tm_geometry filter functions
 │   └── test_profile_selection.py ← Fixture-based profile selection tests
 ├── dist/                     ← Build output (gitignored)
-├── .agents/skills/           ← Project skills: start-feature, finish-feature
 ├── .scratch/<feature-slug>/  ← Feature workspaces: idea.md, issues/ (see docs/agents/)
 └── docs/
     ├── development-notes.md  ← This file

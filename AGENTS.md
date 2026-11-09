@@ -39,7 +39,7 @@ If an instruction here conflicts with those docs, follow the docs and state the 
   module before any import.
 - `scripts/` — `deploy.bat` (copy into Fusion's AddIns folder), `package.bat` (App Store zip),
   fixture/profile inspectors.
-- Project skills: `.agents/skills/<skill-name>/`. Load with the `Skill` tool before use.
+- Skills: per user under `~/.claude/skills/` (see Skills below). Load with the `Skill` tool before use.
 - Feature workspaces: `.scratch/<feature-slug>/`.
 
 ## Terminology rules
@@ -143,6 +143,9 @@ See `docs/agents/triage-labels.md`.
 ### Skills
 
 The Matt Pocock skills (`/grill-me`, `/grill-with-docs`, `/to-prd`, `/to-issues`, `/tdd`,
-`/diagnose`, `/triage`, …) are installed per user under `~/.claude/skills/`. Project skills
-live in `.agents/skills/`: `start-feature`, `finish-feature`. If a skill name matches what
+`/diagnose`, `/triage`, …) are installed per user under `~/.claude/skills/`. `start-feature` and
+`finish-feature` are shared with Track-On-Topo: `~/.claude/skills/` links to
+`Track-On-Topo/.agents/skills/`, so edit them there. They defer to this file for the default
+branch (`master`), the test loop, the smoke test and the commit policy. Cloud sessions get
+only this repo, so these two skills are not available there. If a skill name matches what
 the user typed, invoke it.
