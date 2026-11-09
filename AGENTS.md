@@ -143,9 +143,9 @@ See `docs/agents/triage-labels.md`.
 ### Skills
 
 The Matt Pocock skills (`/grill-me`, `/grill-with-docs`, `/to-prd`, `/to-issues`, `/tdd`,
-`/diagnose`, `/triage`, …) are installed per user under `~/.claude/skills/`. `start-feature` and
-`finish-feature` are shared with Track-On-Topo: `~/.claude/skills/` links to
-`Track-On-Topo/.agents/skills/`, so edit them there. They defer to this file for the default
-branch (`master`), the test loop, the smoke test and the commit policy. Cloud sessions get
-only this repo, so these two skills are not available there. If a skill name matches what
+`/diagnose`, `/triage`, …) are installed per user under `~/.claude/skills/`. `/start-feature` and
+`/finish-feature` are the maintainer's personal skills and are not in this repo. They defer
+to this file for the default branch (`master`), the test loop, the smoke test and the commit
+policy. Without them (contributors, cloud sessions), follow the Branch workflow above and run
+`scripts/feature_flow.py` directly (`start`, `issues`, `tests`, `open-pr`, `after-merge`). If a skill name matches what
 the user typed, invoke it.
