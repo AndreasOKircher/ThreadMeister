@@ -88,7 +88,8 @@ git clone git clone https://github.com/AndreasOKircher/ThreadMeister.git ThreadM
 7. Choose the **size** (e.g., M3 x 5.7mm standard for an insert, or M4 for a Ridge Thread)
 8. Choose **Blind Hole** or **Through Hole**
 9. Heat-Set Insert only: enable/disable top **chamfer** and bottom **fillet** (recommended: enabled)
-10. Click **OK**
+10. Check the red **preview** of the removed material (switch off with **Show Preview** if slow)
+11. Click **OK**
 
 ## Heat-Set Inserts
 
@@ -142,6 +143,7 @@ M3 x 6mm (custom) = 4.6, 6.0, 1.8
 | `chamfer_enabled_default` | True | Chamfer checkbox state |
 | `bottom_radius_enabled_default` | False | Bottom fillet checkbox state |
 | `show_success_message` | True | Show confirmation dialog after operation |
+| `show_preview` | True | Show Preview checkbox: red preview of the removed material |
 | `hole_type_blind` | True | Hole type: `True` = Blind, `False` = Through |
 | `last_selected_insert` | M3 x 5.7mm (standard) | Last selected insert size |
 

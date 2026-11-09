@@ -10,6 +10,7 @@ from . import tm_config
 from . import tm_ridge
 from .tm_helpers import calc_blind_hole_depth_mm
 from .tm_execute import CommandExecuteHandler
+from .tm_preview import PreviewHandler
 
 
 class CommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
@@ -23,6 +24,10 @@ class CommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
             onExecute = CommandExecuteHandler()
             cmd.execute.add(onExecute)
             tm_state._handlers.append(onExecute)
+
+            onPreview = PreviewHandler()
+            cmd.executePreview.add(onPreview)
+            tm_state._handlers.append(onPreview)
 
             onInputChanged = InputChangedHandler()
             cmd.inputChanged.add(onInputChanged)
@@ -86,6 +91,12 @@ class CommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
                                      'Show Success Message',
                                      True, '',
                                      tm_state.CONFIG['show_success_message'])
+
+            # Show Bore Preview option
+            inputs.addBoolValueInput('showPreview',
+                                     'Show Preview',
+                                     True, '',
+                                     tm_state.CONFIG.get('show_preview', True))
 
             # Debug export button — only visible when enabled in config.ini
             if tm_state.CONFIG.get('enable_debug_export', False):

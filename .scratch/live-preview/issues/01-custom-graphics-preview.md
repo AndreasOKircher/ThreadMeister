@@ -1,6 +1,6 @@
 # Live preview of the Bores before OK
 
-Status: on-branch
+Status: ready-for-human
 
 ## Parent
 
@@ -88,4 +88,10 @@ Red, opacity 0.4. A config setting can come later if wanted. (Decided by the age
 
 ## Implementation Summary
 
-<Filled at issue close.>
+- `core/tm_execute.py`: per-point loop moved into `runBores(targetBody, points, params)`; dialog values read by `BoreParams`. OK path unchanged (saves state, Timeline Group, messages).
+- `core/tm_preview.py` (new): `PreviewHandler` on `executePreview`. Copies body, runs `runBores`, copies again, draws before - after in red, opacity 0.4. Silent.
+- `core/tm_ui.py`: registers the handler; adds the **Show Preview** checkbox.
+- `core/tm_config.py`: `show_preview` read, written, `save_show_preview`. Tests in `tests/test_config.py`.
+- Docs: `docs/changelog.md`, `Readme.md`, `resources/help.html`.
+- Assumption for the smoke test: `CustomGraphicsBRepBody.setOpacity(0.4, True)` exists as written in the issue. If Fusion raises, the preview stays silent and shows nothing.
+- Not done: all manual Fusion smoke tests in the acceptance criteria. Pytest: 147 passed.

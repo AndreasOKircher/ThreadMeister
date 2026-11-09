@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Bore Preview
+- **Bore Preview:** while the dialog is open, the material that will be removed shows as a translucent red shape in the viewport, including Chamfer, Bottom Radius and Ridges. It updates when you change the selection or any option. A point that cannot be bored shows nothing; OK still reports it.
+- New **Show Preview** checkbox (default on). If a large design gets slow, switch it off. Saved as `show_preview` in `[UI State]` of `config.ini`.
+
 ## 1.3.0 — 2026-11-08 — Ridge Thread
 - **New Bore Type: Ridge Thread** (M3, M4, M5). A bore a little larger than the screw with 3 or 4 Ridges inside; the screw forms its own thread in the Ridges, so no Insert is needed. Pick it in the new "Bore Type" dropdown. Blind or through; blind depth defaults to 4 × screw diameter and can be changed in the dialog.
 - Ridge Threads get a lead-in chamfer on each Ridge top edge (78°, 0.28 / 0.33 / 0.37 mm for M3 / M4 / M5). If the chamfer fails, the bore stays and a warning is shown.
