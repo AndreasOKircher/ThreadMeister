@@ -10,11 +10,13 @@ Status: needs-triage
 
 ## What to build
 
-Handle `executePreview` or add a CustomGraphicsGroup in `core/tm_ui.py`, redrawn on
-`inputChanged`, cleared on destroy.
+Handle `executePreview` in `core/tm_ui.py`. In it, build one temporary body per Bore with
+`TemporaryBRepManager` and draw it in a CustomGraphicsGroup: red, translucent (opacity ~0.4).
+Clear the group on each redraw and on destroy. See the 2026-11-09 decision in `../idea.md`.
 
 ## Acceptance criteria
 
+- [ ] Translucent red Bores appear when body + Sketch Points are selected (manual smoke).
 - [ ] Preview appears, updates on size/type change, disappears on cancel (manual smoke).
 - [ ] No preview geometry left in the design or timeline after OK or Cancel.
 - [ ] `python -m pytest -q` passes.
