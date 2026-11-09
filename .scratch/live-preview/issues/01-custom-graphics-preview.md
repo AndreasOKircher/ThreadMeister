@@ -1,6 +1,6 @@
 # Live preview of the Bores before OK
 
-Status: ready-for-agent
+Status: on-branch
 
 ## Parent
 
