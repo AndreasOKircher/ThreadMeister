@@ -95,3 +95,11 @@ Red, opacity 0.4. A config setting can come later if wanted. (Decided by the age
 - Docs: `docs/changelog.md`, `Readme.md`, `resources/help.html`.
 - Assumption for the smoke test: `CustomGraphicsBRepBody.setOpacity(0.4, True)` exists as written in the issue. If Fusion raises, the preview stays silent and shows nothing.
 - Not done: all manual Fusion smoke tests in the acceptance criteria. Pytest: 147 passed.
+
+## Update 2026-11-10 (smoke test)
+
+- Red custom graphics replaced by Fusion's own preview (commit `8f58040`): the red body had zebra stripes (coincident faces with the target body). `tm_preview.py` now only runs `runBores`. `PREVIEW_OPACITY` and the red color are gone.
+- Speed not improved: with 13 Ridge Threads the last ~5 take 2-3 s per preview. Accepted by the user (the Bores must run for real each time).
+- Seen once: a radius at the bore entry in the preview only, after switching Ridge / Insert / Through Hole / Chamfer / Bottom Radius in fast sequence. Design after OK was fine. Not reproducible, no cause found in code. Open a new issue if it comes back.
+- Bore Type is now a radio group (was a dropdown). Fusion draws radio groups like Hole Type.
+- Docs (`docs/changelog.md`, `Readme.md`, `resources/help.html`) still describe the red translucent preview. Update them before `/finish-feature`.
