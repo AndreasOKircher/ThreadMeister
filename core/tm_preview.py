@@ -1,36 +1,14 @@
 """
 tm_preview.py – Bore Preview: PreviewHandler for the command's executePreview event.
 
-Runs the same Bore code as OK (tm_execute.runBores). Fusion rolls the features back when the
-preview ends. The removed material (body before - body after) is drawn translucent red.
+Runs the same Bore code as OK (tm_execute.runBores). Fusion shows the real cut as its own
+preview and rolls the features back when the preview ends.
 Silent: no message boxes, no Timeline Group, no config save.
 """
-import adsk.core, adsk.fusion
+import adsk.core
 from . import tm_state
 from . import tm_ridge
 from .tm_execute import BoreParams, runBores
-
-PREVIEW_RED = (255, 0, 0, 255)
-PREVIEW_OPACITY = 0.4
-
-
-def removedMaterial(before, after):
-    """Return before - after as a temporary BRepBody, or None when nothing was removed."""
-    brepMgr = adsk.fusion.TemporaryBRepManager.get()
-    if not brepMgr.booleanOperation(
-            before, after, adsk.fusion.BooleanTypes.DifferenceBooleanType):
-        return None
-    return before
-
-
-def drawRemoved(component, removed):
-    """Draw the removed material red and translucent in a CustomGraphicsGroup."""
-    group = component.customGraphicsGroups.add()
-    graphicsBody = group.addBRepBody(removed)
-    graphicsBody.color = adsk.fusion.CustomGraphicsSolidColorEffect.create(
-        adsk.core.Color.create(*PREVIEW_RED))
-    graphicsBody.setOpacity(PREVIEW_OPACITY, True)
-
 
 def inputsReady(inputs):
     """Show Preview on, a Target Body and a Sketch Point selected, Ridge depth usable."""
@@ -59,19 +37,11 @@ class PreviewHandler(adsk.core.CommandEventHandler):
             pointSelect = inputs.itemById('pointSelect')
             points = [pointSelect.selection(i).entity for i in range(pointSelect.selectionCount)]
 
-            brepMgr = adsk.fusion.TemporaryBRepManager.get()
-            before = brepMgr.copy(targetBody)
-
             params = BoreParams(inputs)
             params.shouldExport = False
-            result = runBores(targetBody, points, params)
-            if result.successCount == 0:
-                return
-
-            after = brepMgr.copy(targetBody)
-            removed = removedMaterial(before, after)
-            if removed is not None:
-                drawRemoved(targetBody.parentComponent, removed)
+            # The Bores stay in the design while the preview runs: Fusion draws them
+            # itself and rolls them back when the preview ends (no zebra stripes).
+            runBores(targetBody, points, params)
         except Exception:
             # Silent by design (D4): errors are reported only on OK.
             pass

@@ -51,12 +51,11 @@ class CommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
             pointSelect.addSelectionFilter('SketchPoints')
             pointSelect.setSelectionLimits(1, 0)
 
-            # Bore Type dropdown (Heat-Set Insert / Ridge Thread)
+            # Bore Type radio group (Heat-Set Insert / Ridge Thread): either/or
             isRidge = tm_state.CONFIG.get('last_bore_type') == tm_ridge.BORE_TYPE_RIDGE
-            boreTypeDropdown = inputs.addDropDownCommandInput('boreType', 'Bore Type',
-                                                             adsk.core.DropDownStyles.TextListDropDownStyle)
-            boreTypeDropdown.listItems.add(tm_ridge.BORE_TYPE_INSERT, not isRidge)
-            boreTypeDropdown.listItems.add(tm_ridge.BORE_TYPE_RIDGE, isRidge)
+            boreTypeGroup = inputs.addRadioButtonGroupCommandInput('boreType', 'Bore Type')
+            boreTypeGroup.listItems.add(tm_ridge.BORE_TYPE_INSERT, not isRidge)
+            boreTypeGroup.listItems.add(tm_ridge.BORE_TYPE_RIDGE, isRidge)
 
             # Insert size dropdown (Insert Specs, or Ridge Thread sizes)
             insertDropdown = inputs.addDropDownCommandInput('insertSize', 'Insert Size',
