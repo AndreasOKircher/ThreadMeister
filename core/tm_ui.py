@@ -10,6 +10,7 @@ from . import tm_config
 from . import tm_ridge
 from .tm_helpers import calc_blind_hole_depth_mm
 from .tm_execute import CommandExecuteHandler
+from .tm_preview import PreviewHandler
 
 
 class CommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
@@ -23,6 +24,10 @@ class CommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
             onExecute = CommandExecuteHandler()
             cmd.execute.add(onExecute)
             tm_state._handlers.append(onExecute)
+
+            onPreview = PreviewHandler()
+            cmd.executePreview.add(onPreview)
+            tm_state._handlers.append(onPreview)
 
             onInputChanged = InputChangedHandler()
             cmd.inputChanged.add(onInputChanged)
@@ -46,12 +51,11 @@ class CommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
             pointSelect.addSelectionFilter('SketchPoints')
             pointSelect.setSelectionLimits(1, 0)
 
-            # Bore Type dropdown (Heat-Set Insert / Ridge Thread)
+            # Bore Type radio group (Heat-Set Insert / Ridge Thread): either/or
             isRidge = tm_state.CONFIG.get('last_bore_type') == tm_ridge.BORE_TYPE_RIDGE
-            boreTypeDropdown = inputs.addDropDownCommandInput('boreType', 'Bore Type',
-                                                             adsk.core.DropDownStyles.TextListDropDownStyle)
-            boreTypeDropdown.listItems.add(tm_ridge.BORE_TYPE_INSERT, not isRidge)
-            boreTypeDropdown.listItems.add(tm_ridge.BORE_TYPE_RIDGE, isRidge)
+            boreTypeGroup = inputs.addRadioButtonGroupCommandInput('boreType', 'Bore Type')
+            boreTypeGroup.listItems.add(tm_ridge.BORE_TYPE_INSERT, not isRidge)
+            boreTypeGroup.listItems.add(tm_ridge.BORE_TYPE_RIDGE, isRidge)
 
             # Insert size dropdown (Insert Specs, or Ridge Thread sizes)
             insertDropdown = inputs.addDropDownCommandInput('insertSize', 'Insert Size',
@@ -86,6 +90,12 @@ class CommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
                                      'Show Success Message',
                                      True, '',
                                      tm_state.CONFIG['show_success_message'])
+
+            # Show Bore Preview option
+            inputs.addBoolValueInput('showPreview',
+                                     'Show Preview',
+                                     True, '',
+                                     tm_state.CONFIG.get('show_preview', True))
 
             # Debug export button — only visible when enabled in config.ini
             if tm_state.CONFIG.get('enable_debug_export', False):
@@ -152,7 +162,7 @@ class ValidateInputsHandler(adsk.core.ValidateInputsEventHandler):
 
 
 def isRidgeSelected(inputs):
-    """True when the Bore Type dropdown is on Ridge Thread."""
+    """True when the Bore Type radio group is on Ridge Thread."""
     boreType = inputs.itemById('boreType')
     return boreType.selectedItem.name == tm_ridge.BORE_TYPE_RIDGE
 

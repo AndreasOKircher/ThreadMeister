@@ -11,7 +11,8 @@ from core.tm_config import (
     save_last_selected_insert,
     save_checkbox_states,
     create_default_config,
-    save_bore_type_state
+    save_bore_type_state,
+    save_show_preview
 )
 from core import tm_state
 
@@ -307,3 +308,31 @@ class TestRidgeThreadConfig:
         assert '# Inner diameter at the ridges' in text
         assert tm_state.RIDGE_THREAD_SPECS == {'M3': 2.40, 'M4': 3.50, 'M5': 4.50}
         assert 'M4 x 8.1mm (standard)' in tm_state.INSERT_SPECS
+
+
+class TestShowPreviewConfig:
+    """show_preview in [UI State]: default on, saved and read back."""
+
+    @pytest.fixture
+    def ini(self, tmp_path, monkeypatch):
+        path = tmp_path / 'config.ini'
+        monkeypatch.setattr('core.tm_config._get_config_path', lambda: str(path))
+        return path
+
+    def test_default_is_on(self, ini):
+        _write_ini(ini, _BASE_INI)
+        load_config()
+        assert tm_state.CONFIG['show_preview'] is True
+
+    def test_save_off_and_read_back(self, ini):
+        _write_ini(ini, _BASE_INI)
+        save_show_preview(False)
+        load_config()
+        assert tm_state.CONFIG['show_preview'] is False
+        assert 'show_preview = False' in ini.read_text(encoding='utf-8')
+
+    def test_default_config_file_keeps_value(self, ini):
+        create_default_config()
+        save_show_preview(False)
+        load_config()
+        assert tm_state.CONFIG['show_preview'] is False

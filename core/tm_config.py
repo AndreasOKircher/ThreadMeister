@@ -96,6 +96,8 @@ def load_config():
             config, 'show_success_message', 'UI State', True, 'boolean')
         tm_state.CONFIG['hole_type_blind'] = _get(
             config, 'hole_type_blind', 'UI State', True, 'boolean')
+        tm_state.CONFIG['show_preview'] = _get(
+            config, 'show_preview', 'UI State', True, 'boolean')
         tm_state.CONFIG['last_selected_insert'] = _get(
             config, 'last_selected_insert', 'UI State', 'M3 x 5.7mm (standard)')
         tm_state.CONFIG['last_bore_type'] = _get(
@@ -247,6 +249,7 @@ def _write_config_file(config_file=None):
     config.set('UI State', 'bottom_radius_enabled_default', str(tm_state.CONFIG.get('bottom_radius_enabled_default', False)))
     config.set('UI State', 'show_success_message', str(tm_state.CONFIG.get('show_success_message', True)))
     config.set('UI State', 'hole_type_blind', str(tm_state.CONFIG.get('hole_type_blind', True)))
+    config.set('UI State', 'show_preview', str(tm_state.CONFIG.get('show_preview', True)))
     config.set('UI State', 'last_selected_insert', tm_state.CONFIG.get('last_selected_insert', 'M3 x 5.7mm (standard)'))
     config.set('UI State', 'last_bore_type', tm_state.CONFIG.get('last_bore_type', 'Heat-Set Insert'))
     config.set('UI State', 'last_ridge_thread', tm_state.CONFIG.get('last_ridge_thread', 'M3'))
@@ -285,6 +288,21 @@ def save_bore_type_state(bore_type, ridge_thread_size):
             config.add_section('UI State')
         config.set('UI State', 'last_bore_type', bore_type)
         config.set('UI State', 'last_ridge_thread', ridge_thread_size)
+        with open(config_file, 'w', encoding='utf-8') as f:
+            config.write(f)
+    except Exception:
+        pass
+
+
+def save_show_preview(show_preview):
+    """Persist the Show Preview checkbox to config.ini."""
+    try:
+        config_file = _get_config_path()
+        config = _read_config_file(config_file)
+        section = 'UI State' if config.has_section('UI State') else 'Settings'
+        if not config.has_section(section):
+            config.add_section(section)
+        config.set(section, 'show_preview', str(show_preview))
         with open(config_file, 'w', encoding='utf-8') as f:
             config.write(f)
     except Exception:
