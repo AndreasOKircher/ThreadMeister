@@ -1,7 +1,7 @@
 # Changelog
 
 ## Unreleased — Bore Preview
-- **Bore Preview:** while the dialog is open, the material that will be removed shows as a translucent red shape in the viewport, including Chamfer, Bottom Radius and Ridges. It updates when you change the selection or any option. A point that cannot be bored shows nothing; OK still reports it.
+- **Bore Preview:** while the dialog is open, the material that will be removed shows as a preview of Fusion's own cut in the viewport, including Chamfer, Bottom Radius and Ridges. It updates when you change the selection or any option. A point that cannot be bored shows nothing; OK still reports it.
 - New **Show Preview** checkbox (default on). If a large design gets slow, switch it off. Saved as `show_preview` in `[UI State]` of `config.ini`.
 
 ## 1.3.0 — 2026-11-08 — Ridge Thread

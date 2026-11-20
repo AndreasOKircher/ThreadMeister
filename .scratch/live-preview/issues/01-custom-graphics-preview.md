@@ -1,6 +1,6 @@
 # Live preview of the Bores before OK
 
-Status: ready-for-human
+Status: completed
 
 ## Parent
 
