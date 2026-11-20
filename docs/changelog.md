@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased — Bore Preview
+## 1.4.0 — 2026-11-20 — Bore Preview
 - **Bore Preview:** while the dialog is open, the material that will be removed shows as a preview of Fusion's own cut in the viewport, including Chamfer, Bottom Radius and Ridges. It updates when you change the selection or any option. A point that cannot be bored shows nothing; OK still reports it.
-- New **Show Preview** checkbox (default on). If a large design gets slow, switch it off. Saved as `show_preview` in `[UI State]` of `config.ini`.
+- New **Show Preview** checkbox (default on). With many bores selected (more than about 5) the preview can be slow. If it gets slow, switch it off. Saved as `show_preview` in `[UI State]` of `config.ini`.
 
 ## 1.3.0 — 2026-11-08 — Ridge Thread
 - **New Bore Type: Ridge Thread** (M3, M4, M5). A bore a little larger than the screw with 3 or 4 Ridges inside; the screw forms its own thread in the Ridges, so no Insert is needed. Pick it in the new "Bore Type" dropdown. Blind or through; blind depth defaults to 4 × screw diameter and can be changed in the dialog.
