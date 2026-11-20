@@ -6,7 +6,6 @@ preview and rolls the features back when the preview ends.
 Silent: no message boxes, no Timeline Group, no config save.
 """
 import adsk.core
-from . import tm_state
 from . import tm_ridge
 from .tm_execute import BoreParams, runBores
 

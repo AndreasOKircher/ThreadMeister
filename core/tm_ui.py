@@ -162,7 +162,7 @@ class ValidateInputsHandler(adsk.core.ValidateInputsEventHandler):
 
 
 def isRidgeSelected(inputs):
-    """True when the Bore Type dropdown is on Ridge Thread."""
+    """True when the Bore Type radio group is on Ridge Thread."""
     boreType = inputs.itemById('boreType')
     return boreType.selectedItem.name == tm_ridge.BORE_TYPE_RIDGE
 
