@@ -71,7 +71,7 @@ Which side of the Sketch Plane the Bore goes into — the side where the Target 
 Computed by `findExtrudeDirectionFromSketch()`.
 
 **Bore Type**:
-What a Bore is for, chosen in the dialog's Bore Type dropdown: **Heat-Set Insert** (an
+What a Bore is for, chosen in the dialog's Bore Type radio group: **Heat-Set Insert** (an
 Insert Bore, sized from an Insert Spec) or **Ridge Thread**.
 _Avoid_: insert type, hole kind
 
@@ -98,8 +98,8 @@ Optional fillet on the floor edge of a Blind Hole (`bottom_radius_size`).
 _Avoid_: bottom fillet (in UI text), rounding
 
 **Bore Preview**:
-The translucent red display of the material the Bores will remove, shown while the dialog is
-open and before OK. Exact: it includes Chamfer, Bottom Radius and Ridges. Can be turned off
+The display of the material the Bores will remove, shown while the dialog is
+open and before OK. It is Fusion's own preview of the real cut. Exact: it includes Chamfer, Bottom Radius and Ridges. Can be turned off
 with the dialog's Show Preview checkbox.
 _Avoid_: live preview, ghost, tool body
 

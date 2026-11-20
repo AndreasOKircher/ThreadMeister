@@ -34,6 +34,8 @@ ThreadMeister/
 │   ├── tm_geometry.py        ← Geometry: profile selection, extrude direction, chamfer, fillet
 │   ├── tm_execute.py         ← Execution: CommandExecuteHandler (hole creation loop)
 │   ├── tm_ui.py              ← UI: CommandCreatedHandler, input handlers
+│   ├── tm_preview.py         ← Bore Preview: PreviewHandler (executePreview event)
+│   ├── tm_ridge.py           ← Ridge Thread geometry and constants
 │   └── tm_debug_export.py    ← Debug: export sketch data to JSON fixtures
 ├── resources/
 │   ├── icons/                ← Toolbar icons (16x16 – 128x128)
@@ -70,12 +72,21 @@ The config file is organized into four sections:
 | `[Settings]` | Design parameters (chamfer_size, blind_hole_extra_depth, bottom_radius_size) | User-edited |
 | `[Inserts]` | Insert specifications (name = diameter, length, min_wall) | User-edited |
 | `[Ridge Threads]` | Inner diameter at the Ridges per Ridge Thread size (`M3 = 2.4`); other Ridge Thread geometry is built into `core/tm_ridge.py`. Added automatically if missing. | User-edited |
-| `[UI State]` | Remembered menu state (checkbox states, last insert, hole type, last Bore Type, last Ridge Thread size) | Auto-saved by add-in |
+| `[UI State]` | Remembered menu state (checkbox states, last insert, hole type, last Bore Type, last Ridge Thread size, `show_preview`) | Auto-saved by add-in |
 | `[Developer]` | Debug flags (enable_logging, enable_debug_export) | User-edited |
 
 **Backward compatibility:** `tm_config.py` auto-migrates old single-section configs. If `[UI State]` is missing, all keys are read from `[Settings]` as fallback. On next save, the file is rewritten in the new format.
 
 **Chamfer/depth relationship:** The chamfer size is added to the extrude length because the chamfer cuts into the top of the bore. Total bore depth = insert length + `blind_hole_extra_depth` + chamfer (if enabled). Example with defaults: 5.7 + 1.0 + 0.5 = 7.2 mm.
+
+### Bore Preview (v1.4.0)
+
+`tm_preview.PreviewHandler` runs on Fusion's `executePreview` event. It calls the same `tm_execute.runBores(targetBody, points, params)` as OK, with `BoreParams` read from the dialog inputs and `shouldExport = False`. The Bores stay in the design while the preview runs. Fusion draws them as its own preview and rolls them back when the preview ends, so there is no custom graphics (the earlier red custom-graphics version showed zebra stripes and was dropped).
+
+- `inputsReady()` gates it: Show Preview on, a Target Body and a Sketch Point selected, and a usable Ridge depth.
+- Errors are swallowed; they are reported only on OK.
+- **Speed:** each point runs the full Bore build. With more than about 5 points the preview can be slow (13 Ridge Threads: the last ~5 take 2-3 s). Accepted; the user can switch it off with Show Preview.
+- Assumption, only Fusion can confirm: the rollback behaviour of the preview. It was checked by manual smoke test in v1.4.0.
 
 ## Code Structure (v1.2.0 — modular)
 
@@ -88,7 +99,9 @@ The config file is organized into four sections:
 | `tm_helpers.py` | Utilities: `isSamePoint()`, `isSameCircle()`, `calc_blind_hole_depth()`, `calc_blind_hole_depth_mm()`, `log()` |
 | `tm_geometry.py` | Core geometry: `findProfileForCircle()`, `resolveSketchPlane()`, `alignExtrudeDirection()`, `findExtrudeDirectionFromSketch()`, `findChamferEdge()`, `addChamferToEdge()`, `findDistanceThroughBody()`, `addBottomRadiusToBlindHole()` |
 | `tm_execute.py` | `CommandExecuteHandler.notify()` — orchestrates the hole creation loop |
-| `tm_ui.py` | `CommandCreatedHandler`, `InputChangedHandler`, `ValidateInputsHandler` |
+| `tm_ui.py` | `CommandCreatedHandler`, `InputChangedHandler`, `ValidateInputsHandler`. Bore Type is a radio group; Show Preview is a checkbox. |
+| `tm_preview.py` | `PreviewHandler` (executePreview event) and `inputsReady()`: runs `runBores` silently (no message box, no Timeline Group, no config save) |
+| `tm_ridge.py` | Ridge Thread geometry and constants (`BORE_TYPE_RIDGE`) |
 | `tm_debug_export.py` | JSON export of sketch profiles/curves for debugging and test fixtures |
 
 ### Execution flow (v1.2.0)
